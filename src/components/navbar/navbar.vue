@@ -109,22 +109,11 @@ const leave = (el) => {
 };
 
 const menuItems = [
-  {
-    label: "首页",
-    name: "home",
-    emoji: "🏠",
-  },
-  {
-    label: "社区",
-    name: "community",
-    emoji: "🤗",
-    subItems: [
-      { label: "益论坛", name: "forum", emoji: "💬" },
-      { label: "益回收", name: "recycling", emoji: "♻️" },
-      { label: "照片墙", name: "photoWall", emoji: "📸" },
-      { label: "益AI", name: "ai", emoji: "🤖" },
-    ],
-  },
+  // {
+  //   label: "首页",
+  //   name: "home",
+  //   emoji: "🏠",
+  // },
   {
     label: "公益",
     name: "charitable-projects",
@@ -140,16 +129,27 @@ const menuItems = [
     ],
   },
   {
-    label: "关于",
-    name: "about-us",
-    emoji: "ℹ️",
+    label: "社区",
+    name: "community",
+    emoji: "🤗",
     subItems: [
-      { label: "基金会简介", name: "foundation-introduction", emoji: "📚" },
-      { label: "理事会简介", name: "board-intro", emoji: "👥" },
-      { label: "荣誉表彰", name: "honors", emoji: "🏅" },
-      { label: "联系我们", name: "contact-us", emoji: "📞" },
+      { label: "益论坛", name: "forum", emoji: "💬" },
+      { label: "益回收", name: "recycling", emoji: "♻️" },
+      { label: "照片墙", name: "photoWall", emoji: "📸" },
+      { label: "益AI", name: "ai", emoji: "🤖" },
     ],
   },
+  // {
+  //   label: "关于",
+  //   name: "about-us",
+  //   emoji: "ℹ️",
+  //   subItems: [
+  //     { label: "基金会简介", name: "foundation-introduction", emoji: "📚" },
+  //     { label: "理事会简介", name: "board-intro", emoji: "👥" },
+  //     { label: "荣誉表彰", name: "honors", emoji: "🏅" },
+  //     { label: "联系我们", name: "contact-us", emoji: "📞" },
+  //   ],
+  // },
   {
     label: "资讯",
     name: "information",
