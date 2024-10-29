@@ -183,17 +183,31 @@ const showDropdown = (name) => {
 const handleMenuItemMouseLeave = (event) => {
   hideDropdownTimer = setTimeout(() => {
     if (dropdownContainer.value) {
-      const rect = dropdownContainer.value.getBoundingClientRect();
-      const { clientY } = event;
-      if (clientY > rect.bottom) {
+      const dropdownRect = dropdownContainer.value.getBoundingClientRect();
+      const { clientX, clientY } = event;
+      
+      // 只有当鼠标位置在下拉框的下方或左右两侧时才隐藏
+      if (clientY > dropdownRect.bottom || 
+          clientX < dropdownRect.left || 
+          clientX > dropdownRect.right) {
         activeDropdown.value = null;
       }
     }
   }, 200);
 };
 
-const handleDropdownMouseLeave = () => {
-  startHideDropdownTimer();
+const handleDropdownMouseLeave = (event) => {
+  if (dropdownContainer.value) {
+    const dropdownRect = dropdownContainer.value.getBoundingClientRect();
+    const { clientX, clientY } = event;
+    
+    // 只有当鼠标位置在下拉框的下方或左右两侧时才启动隐藏计时器
+    if (clientY > dropdownRect.bottom || 
+        clientX < dropdownRect.left || 
+        clientX > dropdownRect.right) {
+      startHideDropdownTimer();
+    }
+  }
 };
 
 const startHideDropdownTimer = () => {
