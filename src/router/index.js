@@ -24,11 +24,15 @@ const routes = [
     path: "/main", // 主页面的路径
     component: () => import("@/layouts/MainLayout.vue"),
     children: [
+      // {
+      //   path: "",
+      //   name: "home",
+      //   component: () =>
+      //     import("@/views/home/index.vue"),
+      // },
       {
         path: "",
-        name: "home",
-        component: () =>
-          import("@/views/home/index.vue"),
+        component: () => import("@/views/charitableProjects/components/PlatformCharity.vue"),
       },
       {
         path: "charitable-projects",

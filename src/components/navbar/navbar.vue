@@ -109,22 +109,11 @@ const leave = (el) => {
 };
 
 const menuItems = [
-  {
-    label: "首页",
-    name: "home",
-    emoji: "🏠",
-  },
-  {
-    label: "社区",
-    name: "community",
-    emoji: "🤗",
-    subItems: [
-      { label: "益论坛", name: "forum", emoji: "💬" },
-      { label: "益回收", name: "recycling", emoji: "♻️" },
-      { label: "照片墙", name: "photoWall", emoji: "📸" },
-      { label: "益AI", name: "ai", emoji: "🤖" },
-    ],
-  },
+  // {
+  //   label: "首页",
+  //   name: "home",
+  //   emoji: "🏠",
+  // },
   {
     label: "公益",
     name: "charitable-projects",
@@ -140,16 +129,27 @@ const menuItems = [
     ],
   },
   {
-    label: "关于",
-    name: "about-us",
-    emoji: "ℹ️",
+    label: "社区",
+    name: "community",
+    emoji: "🤗",
     subItems: [
-      { label: "基金会简介", name: "foundation-introduction", emoji: "📚" },
-      { label: "理事会简介", name: "board-intro", emoji: "👥" },
-      { label: "荣誉表彰", name: "honors", emoji: "🏅" },
-      { label: "联系我们", name: "contact-us", emoji: "📞" },
+      { label: "益论坛", name: "forum", emoji: "💬" },
+      { label: "益回收", name: "recycling", emoji: "♻️" },
+      { label: "照片墙", name: "photoWall", emoji: "📸" },
+      { label: "益AI", name: "ai", emoji: "🤖" },
     ],
   },
+  // {
+  //   label: "关于",
+  //   name: "about-us",
+  //   emoji: "ℹ️",
+  //   subItems: [
+  //     { label: "基金会简介", name: "foundation-introduction", emoji: "📚" },
+  //     { label: "理事会简介", name: "board-intro", emoji: "👥" },
+  //     { label: "荣誉表彰", name: "honors", emoji: "🏅" },
+  //     { label: "联系我们", name: "contact-us", emoji: "📞" },
+  //   ],
+  // },
   {
     label: "资讯",
     name: "information",
@@ -183,17 +183,31 @@ const showDropdown = (name) => {
 const handleMenuItemMouseLeave = (event) => {
   hideDropdownTimer = setTimeout(() => {
     if (dropdownContainer.value) {
-      const rect = dropdownContainer.value.getBoundingClientRect();
-      const { clientY } = event;
-      if (clientY > rect.bottom) {
+      const dropdownRect = dropdownContainer.value.getBoundingClientRect();
+      const { clientX, clientY } = event;
+      
+      // 只有当鼠标位置在下拉框的下方或左右两侧时才隐藏
+      if (clientY > dropdownRect.bottom || 
+          clientX < dropdownRect.left || 
+          clientX > dropdownRect.right) {
         activeDropdown.value = null;
       }
     }
   }, 200);
 };
 
-const handleDropdownMouseLeave = () => {
-  startHideDropdownTimer();
+const handleDropdownMouseLeave = (event) => {
+  if (dropdownContainer.value) {
+    const dropdownRect = dropdownContainer.value.getBoundingClientRect();
+    const { clientX, clientY } = event;
+    
+    // 只有当鼠标位置在下拉框的下方或左右两侧时才启动隐藏计时器
+    if (clientY > dropdownRect.bottom || 
+        clientX < dropdownRect.left || 
+        clientX > dropdownRect.right) {
+      startHideDropdownTimer();
+    }
+  }
 };
 
 const startHideDropdownTimer = () => {
