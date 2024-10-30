@@ -3,81 +3,62 @@
     <div class="content-wrapper">
       <el-form
         ref="ruleFormRef"
-        style="max-width: 600px"
         :model="ruleForm"
         :rules="rules"
-        label-width="auto"
+        label-width="120px"
         class="demo-ruleForm"
-        :size="formSize"
-        status-icon
       >
         <el-form-item label="用户名" prop="name">
           <el-input v-model="ruleForm.name" />
         </el-form-item>
-        <el-form-item label="开始工作" required>
-          <el-col :span="24">
-            <el-form-item prop="date1">
-              <el-date-picker
-                v-model="ruleForm.date1"
-                type="date"
-                aria-label="Pick a date"
-                placeholder="选择日期"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
+
+        <el-form-item label="职业方向" prop="career_direction">
+          <el-input v-model="ruleForm.career_direction" />
         </el-form-item>
-        <el-form-item label="职业方向" prop="company_path">
-          <el-input
-            v-model="ruleForm.company_path"
-            placeholder="填写您的职业方向"
-            :options="options"
-          />
+
+        <el-form-item label="职位" prop="position">
+          <el-input v-model="ruleForm.position" />
         </el-form-item>
-        <el-form-item label="职位">
-          <el-input
-            v-model="ruleForm.job_name"
-            placeholder="填写您的职位"
-            :options="options"
-          />
+
+        <el-form-item label="公司" prop="company">
+          <el-input v-model="ruleForm.company" />
         </el-form-item>
-        <el-form-item label="公司">
-          <el-input
-            v-model="ruleForm.company_name"
-            placeholder="填写您的公司"
-            :options="options"
-          />
+
+        <el-form-item label="个人网站" prop="personal_website">
+          <el-input v-model="ruleForm.personal_website" />
         </el-form-item>
-        <el-form-item label="个人主页">
+
+        <el-form-item label="个人简介" prop="bio">
           <el-input
-            v-model="ruleForm.personal_homepage"
-            placeholder="填写您的个人主页"
-            :options="options"
-          />
-        </el-form-item>
-        <el-form-item label="个人介绍">
-          <el-input
-            v-model="ruleForm.desc"
-            placeholder="填写您的个人介绍"
+            v-model="ruleForm.bio"
             type="textarea"
+            :rows="4"
           />
         </el-form-item>
-        <el-form-item label="兴趣标签" prop="interests">
-          <div class="interest-tags">
-            <el-check-tag
-              v-for="tag in interestOptions"
-              :key="tag.value"
-              :checked="ruleForm.interests.includes(tag.value)"
-              @change="(checked) => handleChange(tag.value, checked)"
-            >
-              {{ tag.label }}
-            </el-check-tag>
-          </div>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="submitForm(ruleFormRef)"
-            >保存修改</el-button
+
+        <el-form-item label="兴趣标签" prop="interest_tags">
+          <el-select
+            v-model="ruleForm.interest_tags"
+            multiple
+            filterable
+            allow-create
+            default-first-option
+            placeholder="请选择或输入兴趣标签"
           >
+            <el-option
+              v-for="tag in interestOptions"
+              :key="tag"
+              :label="tag"
+              :value="tag"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="submitForm(ruleFormRef)">
+            保存修改
+          </el-button>
+          <el-button @click="resetForm(ruleFormRef)">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -85,60 +66,116 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted, onBeforeMount } from "vue";
+import { updateUserProfile, getUserProfile, getAvatarUrl } from '@/api/user';
+import { ElMessage } from 'element-plus';
+import { useRouter } from 'vue-router';
 
 const formSize = ref("default");
 const ruleFormRef = ref(null);
 const ruleForm = reactive({
-  name: "Hello",
-  date1: "",
-  company_path: "",
-  job_name: "",
-  company_name: "",
-  personal_homepage: "",
-  desc: "",
-  interests: [], // 新增兴趣标签字段
+  name: "",
+  career_direction: "",
+  position: "",
+  company: "",
+  personal_website: "",
+  bio: "",
+  interest_tags: [],
+  avatar_url: ""
 });
 
 const rules = reactive({
   name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-  date1: [
-    {
-      type: "date",
-      required: true,
-      message: "请选择开始工作日期",
-      trigger: "change",
-    },
-  ],
-  company_path: [
-    { required: true, message: "请输入职业方向", trigger: "blur" },
-  ],
-  job_name: [{ required: true, message: "请输入职位", trigger: "blur" }],
-  company_name: [
-    { required: true, message: "请输入公司名称", trigger: "blur" },
-  ],
-  personal_homepage: [
-    { required: true, message: "请输入个人主页", trigger: "blur" },
-  ],
-  desc: [{ required: true, message: "请输入个人介绍", trigger: "blur" }],
-  interests: [
-    {
-      type: "array",
-      required: true,
-      message: "至少选择一个兴趣标签",
-      trigger: "change",
-    },
-  ],
+  career_direction: [{ required: true, message: "请输入职业方向", trigger: "blur" }],
+  position: [{ required: true, message: "请输入职位", trigger: "blur" }],
+  company: [{ required: true, message: "请输入公司", trigger: "blur" }],
+  personal_website: [{ required: true, message: "请输入个人网站", trigger: "blur" }],
+  bio: [{ required: true, message: "请输入个人简介", trigger: "blur" }],
+  interest_tags: [{ required: true, message: "至少选择一个兴趣标签", trigger: "change" }],
+});
+
+const router = useRouter();
+
+// 添加认证检查
+onBeforeMount(() => {
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user'));
+  
+  if (!token || !token.split('.').length === 3 || !user) {
+    // 清除可能损坏的数据
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userId');
+    
+    ElMessage.error('请先登录');
+    router.push('/login');
+    return;
+  }
+});
+
+onMounted(async () => {
+  try {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    const response = await getUserProfile(userId);
+    const profile = response.data.profile;
+    
+    if (profile) {
+      // 更新表单数据
+      Object.assign(ruleForm, {
+        name: profile.username || '',
+        career_direction: profile.careerDirection || '',
+        position: profile.position || '',
+        company: profile.company || '',
+        personal_website: profile.personalWebsite || '',
+        bio: profile.bio || '',
+        interest_tags: profile.interestTags ? profile.interestTags.split(',') : []
+      });
+    }
+  } catch (error) {
+    console.error('Failed to fetch profile:', error);
+    ElMessage.error('获取个人资料失败');
+  }
 });
 
 const submitForm = async (formEl) => {
   if (!formEl) return;
-  await formEl.validate((valid, fields) => {
+  
+  await formEl.validate(async (valid) => {
     if (valid) {
-      console.log("提交成功!");
-      console.log(ruleForm); // 打印表单数据，包括兴趣标签
-    } else {
-      console.log("提交失败!", fields);
+      try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          throw new Error('User ID not found');
+        }
+
+        // 构建提交数据
+        const profileData = {
+          username: ruleForm.name,
+          careerDirection: ruleForm.career_direction,
+          position: ruleForm.position,
+          company: ruleForm.company,
+          personalWebsite: ruleForm.personal_website,
+          bio: ruleForm.bio,
+          interestTags: ruleForm.interest_tags.join(',')
+        };
+
+        const response = await updateUserProfile(userId, profileData);
+        if (response.data.profile) {
+          ElMessage.success('个人资料更新成功');
+          // 更新导航栏用户信息
+          const navbarInstance = getCurrentInstance()?.parent?.refs?.navbar;
+          if (navbarInstance) {
+            navbarInstance.fetchUserInfo();
+          }
+        }
+      } catch (error) {
+        console.error('Failed to update profile:', error);
+        ElMessage.error(error.response?.data?.message || '更新失败');
+      }
     }
   });
 };

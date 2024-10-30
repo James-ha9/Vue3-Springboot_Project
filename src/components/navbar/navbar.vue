@@ -19,7 +19,11 @@
         @click="handleMenuItemClick(item)"
       >
         <span v-if="item.name === 'personal-center'" class="personal-center">
-          <img src="@/assets/background/ActivityNews07.jpeg" alt="User" />
+          <img 
+            :src="userAvatar" 
+            :alt="username"
+            @error="handleAvatarError"
+          />
         </span>
         <span v-else>{{ item.emoji }} {{ item.label }}</span>
       </router-link>
@@ -61,6 +65,10 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { getAvatarUrl, getUserProfile, uploadAvatar } from '@/api/user';
+import defaultAvatarImg from '@/assets/background/RuralRevitalization04.png';
+import { ElMessage } from 'element-plus';
+import { logout } from '@/api/auth';
 
 const route = useRoute();
 const router = useRouter();
@@ -91,6 +99,11 @@ const getRouteForItem = (item) => {
 
 const handleMenuItemClick = (item) => {
   if (item.name === "personal-center") {
+    if (!checkLoginStatus()) {
+      ElMessage.warning('请先登录');
+      router.push('/login');
+      return;
+    }
     router.push({ name: "personal-data" });
   } else {
     router.push({ name: item.name });
@@ -224,15 +237,108 @@ const checkScroll = () => {
   isScrolled.value = window.scrollY > 50;
 };
 
+const defaultAvatar = defaultAvatarImg;
+
+const userAvatar = ref(defaultAvatar);
+const username = ref('');
+
+const handleAvatarError = (e) => {
+  e.target.src = defaultAvatar;
+};
+
+const fetchUserInfo = async () => {
+  if (!localStorage.getItem('token')) {
+    userAvatar.value = defaultAvatar;
+    return;
+  }
+
+  try {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      throw new Error('User ID not found');
+    }
+
+    const response = await getUserProfile(userId);
+    const profile = response.data.profile;
+    
+    // 从本地存储获取用户基本信息
+    const user = JSON.parse(localStorage.getItem('user'));
+    username.value = user?.username || '';
+    
+    // 设置头像
+    userAvatar.value = profile?.avatarUrl 
+      ? getAvatarUrl(profile.avatarUrl)
+      : defaultAvatar;
+
+  } catch (error) {
+    console.error('Failed to fetch user info:', error);
+    userAvatar.value = defaultAvatar;
+    
+    if (error.response?.status === 401) {
+      ElMessage.error('请重新登录');
+      logout();
+    }
+  }
+};
+
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
   window.addEventListener("scroll", checkScroll);
+  fetchUserInfo();
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
   window.removeEventListener("scroll", checkScroll);
 });
+
+const checkLoginStatus = () => {
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user'));
+  
+  if (!token || !user || token.split('.').length !== 3) {
+    // 清除无效的登录状态
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userId');
+    return false;
+  }
+  return true;
+};
+
+const handleAvatarUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  try {
+    const userId = localStorage.getItem('userId');
+    if (!userId) throw new Error('User ID not found');
+
+    const response = await uploadAvatar(userId, file);
+    if (response.data?.profile?.avatarUrl) {
+      userAvatar.value = getAvatarUrl(response.data.profile.avatarUrl);
+      ElMessage.success('头像上传成功');
+    }
+  } catch (error) {
+    console.error('Avatar upload failed:', error);
+    ElMessage.error(error.response?.data?.message || '头像上传失败');
+  }
+};
+
+const handleLogout = async () => {
+  try {
+    const success = await logout();
+    if (success) {
+      ElMessage.success('已成功退出登录');
+      await router.push('/login');
+    } else {
+      throw new Error('登出失败');
+    }
+  } catch (error) {
+    console.error('Logout failed:', error);
+    ElMessage.error('登出失败，请重试');
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -288,7 +394,7 @@ onBeforeUnmount(() => {
   margin-left: 1%;
   display: flex;
   flex-direction: column; // 垂直排列
-  justify-content: center; // 垂直对齐到中间
+  justify-content: center; // 垂直���齐到中间
   margin-left: 10px; // 可选，调整 logo 和文本之间的间距
   width: 120px;
 }
@@ -321,12 +427,21 @@ onBeforeUnmount(() => {
   height: 90%;
   display: flex;
   align-items: center;
+  justify-content: center;
 
   img {
-    width: 70%;
-    height: auto;
+    width: 40px; /* 固定宽度 */
+    height: 40px; /* 固定高度 */
     object-fit: cover;
     border-radius: 50%;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
   }
 }
 
