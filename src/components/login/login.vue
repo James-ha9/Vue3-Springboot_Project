@@ -4,7 +4,7 @@
     <div class="form-container">
       <div class="form-content">
         <h2>欢迎您的到来</h2>
-        <form @submit.prevent="handleSubmit" autocomplete="off">
+        <form @submit.prevent="handleLogin" autocomplete="off">
           <div class="input-group">
             <label for="username">用户名</label>
             <div class="input-wrapper">
@@ -14,6 +14,7 @@
                 type="text"
                 placeholder="输入用户名"
                 required
+                :disabled="loading"
               />
             </div>
           </div>
@@ -27,12 +28,18 @@
                 type="password"
                 placeholder="输入您的密码"
                 required
+                :disabled="loading"
                 @input="validatePassword"
               />
             </div>
           </div>
 
-          <button type="submit">登录</button>
+          <button 
+            type="submit" 
+            :disabled="loading"
+          >
+            {{ loading ? '登录中...' : '登录' }}
+          </button>
         </form>
 
         <div class="form-footer">
@@ -51,38 +58,42 @@ import { Sky } from "three/examples/jsm/objects/Sky";
 import { Water } from "three/examples/jsm/objects/Water";
 import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise";
 import { useRouter } from "vue-router";
-import { login } from '@/api/auth'; // 添加这行
+import { login } from '@/api/auth';
+import { ElMessage } from 'element-plus';
 
-const threeCanvas = ref(null); // Declare the canvas ref
+const threeCanvas = ref(null);
 const username = ref("");
 const password = ref("");
+const loading = ref(false);
 const router = useRouter();
 
-const handleSubmit = () => {
-  router.push("/main");
+const handleLogin = async () => {
+  if (!username.value || !password.value) {
+    ElMessage.warning('请输入用户名和密码');
+    return;
+  }
+
+  try {
+    loading.value = true;
+    const response = await login(username.value, password.value);
+    
+    if (response.data?.token) {
+      ElMessage.success('登录成功');
+      // 使用 await 等待路由跳转完成
+      await router.push('/main/charitable-projects/platform-charity');
+    } else {
+      throw new Error('登录失败：未收到有效的认证信息');
+    }
+  } catch (error) {
+    console.error('Login failed:', error);
+    ElMessage.error(error.response?.data?.message || '登录失败，请检查用户名和密码');
+  } finally {
+    loading.value = false;
+  }
 };
 
-
-// const handleSubmit = async () => {
-//   if (!username.value || !password.value) {
-//     return alert("请输入有效的账号和密码");
-//   }
-//   try {
-//     const response = await login(username.value, password.value);
-//     console.log('登录成功', response.data);
-//     localStorage.setItem('token', response.data.token);
-//     localStorage.setItem('user', JSON.stringify(response.data.user));
-//     router.push("/main");
-//   } catch (error) {
-//     console.error('登录失败', error);
-//     alert(error.response?.data?.message || "登录失败，请重试");
-//   }
-// };
-
-const logout = () => {
-  localStorage.removeItem('token');
-  // 重定向到登录页面或首页
-  router.push('/login');
+const validatePassword = () => {
+  // 添加密码验证逻辑
 };
 
 // Three.js initialization code
