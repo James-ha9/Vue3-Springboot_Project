@@ -18,12 +18,31 @@
         @mouseleave="handleMenuItemMouseLeave"
         @click="handleMenuItemClick(item)"
       >
-        <span v-if="item.name === 'personal-center'" class="personal-center">
-          <img 
-            :src="userAvatar" 
-            :alt="username"
-            @error="handleAvatarError"
+        <span 
+          v-if="item.name === 'personal-center'" 
+          class="personal-center"
+          ref="avatarRef"
+        >
+          <input
+            type="file"
+            ref="avatarInput"
+            @change="handleAvatarUpload"
+            accept="image/*"
+            style="display: none"
           />
+          <transition name="fade">
+            <div class="avatar-container">
+              <img 
+                v-if="!avatarLoading"
+                :src="userAvatar" 
+                :alt="username"
+                @error="handleAvatarError"
+              />
+              <div v-else class="avatar-placeholder">
+                <el-icon class="loading-icon"><Loading /></el-icon>
+              </div>
+            </div>
+          </transition>
         </span>
         <span v-else>{{ item.emoji }} {{ item.label }}</span>
       </router-link>
@@ -59,16 +78,34 @@
         </div>
       </div>
     </transition>
+    <Teleport to="body">
+      <transition name="dropdown">
+        <div 
+          v-if="showAvatarDropdown && avatarDropdownPosition.top" 
+          class="avatar-dropdown"
+          :style="avatarDropdownPosition"
+          @mouseover="clearHideAvatarDropdownTimer"
+          @mouseleave="hideAvatarDropdown"
+        >
+          <div class="avatar-dropdown-item" @click="triggerAvatarUpload">
+            更改头像
+          </div>
+        </div>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { getAvatarUrl, getUserProfile, uploadAvatar } from '@/api/user';
+import { getUserProfile, uploadAvatar } from '@/api/user';
 import defaultAvatarImg from '@/assets/background/RuralRevitalization04.png';
 import { ElMessage } from 'element-plus';
 import { logout } from '@/api/auth';
+import axios from 'axios';
+import { getAvatar, getAvatarUrl } from '@/api/file';
+import { Loading } from '@element-plus/icons-vue'
 
 const route = useRoute();
 const router = useRouter();
@@ -76,6 +113,7 @@ const activeDropdown = ref(null);
 const dropdownContainer = ref(null);
 let hideDropdownTimer = null;
 const isScrolled = ref(false);
+  
 const beforeEnter = (el) => {
   el.style.height = "0";
 };
@@ -94,6 +132,12 @@ const isActiveRoute = (item) => {
 };
 
 const getRouteForItem = (item) => {
+  if (item.name === 'personal-center') {
+    return { name: 'personal-data' };
+  }
+  if (item.subItems && item.subItems.length > 0) {
+    return { name: item.subItems[0].name };
+  }
   return { name: item.name };
 };
 
@@ -105,6 +149,8 @@ const handleMenuItemClick = (item) => {
       return;
     }
     router.push({ name: "personal-data" });
+  } else if (item.subItems && item.subItems.length > 0) {
+    router.push({ name: item.subItems[0].name });
   } else {
     router.push({ name: item.name });
   }
@@ -112,6 +158,7 @@ const handleMenuItemClick = (item) => {
 };
 
 const handleSubItemClick = (subItem) => {
+  if (!subItem.name) return;
   console.log(`Navigating to ${subItem.name}`);
   router.push({ name: subItem.name });
   activeDropdown.value = null;
@@ -185,28 +232,54 @@ const menuItems = [
 
 const activeItem = computed(() => route.name);
 
+const avatarInput = ref(null);
+const showAvatarDropdown = ref(false);
+
+const avatarRef = ref(null);
+
+const avatarDropdownPosition = computed(() => {
+  if (!avatarRef.value) return { top: 0, left: 0 };
+  
+  try {
+    const rect = avatarRef.value.getBoundingClientRect();
+    return {
+      top: `${rect.bottom + window.scrollY}px`,
+      left: `${rect.left + (rect.width - 100) / 2}px`, // 100px是下拉框的宽度
+    };
+  } catch (error) {
+    console.error('Failed to calculate avatar dropdown position:', error);
+    return { top: 0, left: 0 };
+  }
+});
+
 const showDropdown = (name) => {
-  if (name === "personal-center" || name === "home") {
-    activeDropdown.value = null;
+  if (name === "personal-center") {
+    nextTick(() => {
+      showAvatarDropdown.value = true;
+    });
     return;
   }
+  showAvatarDropdown.value = false;
   activeDropdown.value = menuItems.find((item) => item.name === name);
 };
 
 const handleMenuItemMouseLeave = (event) => {
   hideDropdownTimer = setTimeout(() => {
-    if (dropdownContainer.value) {
-      const dropdownRect = dropdownContainer.value.getBoundingClientRect();
-      const { clientX, clientY } = event;
-      
-      // 只有当鼠标位置在下拉框的下方或左右两侧时才隐藏
-      if (clientY > dropdownRect.bottom || 
-          clientX < dropdownRect.left || 
-          clientX > dropdownRect.right) {
-        activeDropdown.value = null;
-      }
+    const target = event.relatedTarget;
+    if (!target || (!target.closest('.avatar-dropdown') && !target.closest('.nav-item'))) {
+      activeDropdown.value = null;
+      showAvatarDropdown.value = false;
     }
   }, 200);
+};
+
+const triggerAvatarUpload = () => {
+  if (!checkLoginStatus()) {
+    ElMessage.warning('请先登录');
+    router.push('/login');
+    return;
+  }
+  avatarInput.value.click();
 };
 
 const handleDropdownMouseLeave = (event) => {
@@ -260,9 +333,15 @@ const handleAvatarError = (e) => {
   e.target.src = defaultAvatar;
 };
 
+// 添加加载状态
+const avatarLoading = ref(true);
+
 const fetchUserInfo = async () => {
+  avatarLoading.value = true; // 开始加载
+  
   if (!localStorage.getItem('token')) {
     userAvatar.value = defaultAvatar;
+    avatarLoading.value = false;
     return;
   }
 
@@ -272,6 +351,7 @@ const fetchUserInfo = async () => {
       throw new Error('User ID not found');
     }
 
+    // 获取用户信息
     const response = await getUserProfile(userId);
     const profile = response.data.profile;
     
@@ -279,14 +359,28 @@ const fetchUserInfo = async () => {
     const user = JSON.parse(localStorage.getItem('user'));
     username.value = user?.username || '';
     
-    // 设置头像
-    userAvatar.value = profile?.avatarUrl 
-      ? getAvatarUrl(profile.avatarUrl)
-      : defaultAvatar;
+    // 获取头像URL
+    const avatarFilename = await getAvatar(userId);
+    if (avatarFilename) {
+      const img = new Image();
+      img.src = getAvatarUrl(avatarFilename);
+      img.onload = () => {
+        userAvatar.value = img.src;
+        avatarLoading.value = false;
+      };
+      img.onerror = () => {
+        userAvatar.value = defaultAvatar;
+        avatarLoading.value = false;
+      };
+    } else {
+      userAvatar.value = defaultAvatar;
+      avatarLoading.value = false;
+    }
 
   } catch (error) {
     console.error('Failed to fetch user info:', error);
     userAvatar.value = defaultAvatar;
+    avatarLoading.value = false;
     
     if (error.response?.status === 401) {
       ElMessage.error('请重新登录');
@@ -320,30 +414,11 @@ const checkLoginStatus = () => {
   return true;
 };
 
-const handleAvatarUpload = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  try {
-    const userId = localStorage.getItem('userId');
-    if (!userId) throw new Error('User ID not found');
-
-    const response = await uploadAvatar(userId, file);
-    if (response.data?.profile?.avatarUrl) {
-      userAvatar.value = getAvatarUrl(response.data.profile.avatarUrl);
-      ElMessage.success('头像上传成功');
-    }
-  } catch (error) {
-    console.error('Avatar upload failed:', error);
-    ElMessage.error(error.response?.data?.message || '头像上传失败');
-  }
-};
-
 const handleLogout = async () => {
   try {
     const success = await logout();
     if (success) {
-      ElMessage.success('已成功退出登录');
+      ElMessage.success('已功退出登录');
       await router.push('/login');
     } else {
       throw new Error('登出失败');
@@ -353,6 +428,65 @@ const handleLogout = async () => {
     ElMessage.error('登出失败，请重试');
   }
 };
+
+let hideAvatarDropdownTimer = null;
+
+const clearHideAvatarDropdownTimer = () => {
+  if (hideAvatarDropdownTimer) {
+    clearTimeout(hideAvatarDropdownTimer);
+  }
+};
+
+const hideAvatarDropdown = () => {
+  hideAvatarDropdownTimer = setTimeout(() => {
+    showAvatarDropdown.value = false;
+  }, 200);
+};
+
+const handleAvatarUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  try {
+    const userId = localStorage.getItem('userId');
+    if (!userId) throw new Error('User ID not found');
+
+    const response = await uploadAvatar(userId, file);
+    
+    if (response.data?.avatarUrl) {
+      await fetchUserAvatar();
+      ElMessage.success('头像上传成功');
+    }
+    showAvatarDropdown.value = false;
+  } catch (error) {
+    console.error('Avatar upload failed:', error);
+    ElMessage.error(error.response?.data?.message || '头像上传失败');
+  }
+};
+
+const fetchUserAvatar = async () => {
+  try {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    const response = await axios.get(`/users/${userId}/avatar`, {
+      responseType: 'blob',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    userAvatar.value = URL.createObjectURL(response.data);
+  } catch (error) {
+    console.error('Failed to fetch avatar:', error);
+    userAvatar.value = defaultAvatar;
+  }
+};
+
+// 在组件挂载时获取头像
+onMounted(() => {
+  fetchUserAvatar();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -408,7 +542,7 @@ const handleLogout = async () => {
   margin-left: 1%;
   display: flex;
   flex-direction: column; // 垂直排列
-  justify-content: center; // 垂直���齐到中间
+  justify-content: center; // 垂直齐到中间
   margin-left: 10px; // 可选，调整 logo 和文本之间的间距
   width: 120px;
 }
@@ -443,9 +577,18 @@ const handleLogout = async () => {
   align-items: center;
   justify-content: center;
 
+  .avatar-container {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   img {
-    width: 40px; /* 固定宽度 */
-    height: 40px; /* 固定高度 */
+    width: 40px;
+    height: 40px;
     object-fit: cover;
     border-radius: 50%;
     border: 2px solid #ffffff;
@@ -456,6 +599,20 @@ const handleLogout = async () => {
       transform: scale(1.1);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
+  }
+
+  .avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading-icon {
+    animation: rotate 1s linear infinite;
   }
 }
 
@@ -514,7 +671,7 @@ const handleLogout = async () => {
     }
 
     &:hover {
-      transform: scale(1.05); // 轻微放大效果
+      transform: scale(1.05); // 轻微放大果
     }
   }
   &:last-child {
@@ -617,6 +774,66 @@ const handleLogout = async () => {
         width: 50%;
       }
     }
+  }
+}
+
+.avatar-dropdown {
+  position: fixed;
+  width: 100px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+  z-index: 1001;
+  transform-origin: top center;
+  
+  &:hover {
+    display: block;
+  }
+}
+
+.avatar-dropdown-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-align: center;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #f5f5f5;
+    color: #31755d;
+  }
+}
+
+// 添加过渡动画
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+// 添加淡入淡出过渡效果
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

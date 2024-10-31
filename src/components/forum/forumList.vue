@@ -13,14 +13,20 @@
         />
         <div class="info">
           <div class="description">
-            <router-link>
+            <!-- <router-link>
               {{ item.description }}
-            </router-link>
+            </router-link> -->
+            <a>
+              {{ item.description }}
+            </a>
           </div>
           <div class="user">
-            <router-link>
+            <!-- <router-link>
               {{ item.user.nickname }}
-            </router-link>
+            </router-link> -->
+            <a>
+              {{ item.user.nickname }}
+            </a>
           </div>
         </div>
       </div>
@@ -36,6 +42,8 @@ import avatar2 from "@/assets/background/ActivityNews02.jpeg";
 import avatar3 from "@/assets/background/ActivityNews03.jpeg";
 import avatar4 from "@/assets/background/ActivityNews04.jpeg";
 import avatar5 from "@/assets/background/ActivityNews05.jpeg";
+
+let fit = ref(null);
 
 const data = reactive([
   {

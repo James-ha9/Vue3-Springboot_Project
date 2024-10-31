@@ -67,9 +67,10 @@
 
 <script setup>
 import { reactive, ref, onMounted, onBeforeMount } from "vue";
-import { updateUserProfile, getUserProfile, getAvatarUrl } from '@/api/user';
+import { updateUserProfile, getUserProfile } from '@/api/user';
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
+import { getAvatar } from '@/api/file';
 
 const formSize = ref("default");
 const ruleFormRef = ref(null);

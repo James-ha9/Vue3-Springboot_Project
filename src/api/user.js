@@ -28,9 +28,10 @@ export const updateAccountSettings = async (userId, settings) => {
 export const getUserProfile = async (userId) => {
   try {
     const response = await axios.get(`/users/${userId}/profile`);
+    console.log('Get user profile response:', response);
     return response;
   } catch (error) {
-    console.error('Get profile error:', error);
+    console.error('Get user profile error:', error);
     throw error;
   }
 };
@@ -58,27 +59,22 @@ export const getAccountSettings = async (userId) => {
 };
 
 // 上传头像
-export const uploadAvatar = async (userId, file) => {
+export const uploadAvatar = async (userId, formData) => {
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    const response = await axios.post(`/users/${userId}/profile/avatar`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+    const response = await axios.post(
+      `/users/${userId}/profile/avatar`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       }
-    });
+    );
     return response;
   } catch (error) {
     console.error('Upload avatar error:', error);
     throw error;
   }
-};
-
-// 获取头像URL
-export const getAvatarUrl = (filename) => {
-  if (!filename) return null;
-  return `${import.meta.env.VITE_API_BASE_URL}/files/avatars/${filename}`;
 };
 
 // 绑定手机号
