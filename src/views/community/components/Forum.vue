@@ -5,7 +5,7 @@
         <el-container>
           <el-main class="main">
             <div class="title-list">
-              <span class="title">益论坛</span>
+              <span class="title">益留言</span>
               <el-divider class="divider" />
             </div>
             <ForumList />
