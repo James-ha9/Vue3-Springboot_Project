@@ -4,6 +4,7 @@ import communityRoutes from "./community";
 import informationRoutes from "./information";
 import aboutUsRoutes from "./aboutUs";
 import personalCenterRoutes from "./personalCenter";
+import VerifyEmail from '@/views/auth/VerifyEmail.vue';
 
 const routes = [
   {
@@ -76,6 +77,11 @@ const routes = [
         redirect: { name: "personal-data" },
       },
     ],
+  },
+  {
+    path: "/verify-email",
+    name: "verify-email",
+    component: VerifyEmail
   },
   {
     path: ""
