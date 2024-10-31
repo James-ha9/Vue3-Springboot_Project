@@ -8,6 +8,13 @@ export default [
         path: "forum",
         name: "forum",
         component: () => import("@/views/community/components/Forum.vue"),
+        children: [
+            {
+                path: "forumDeatil",
+                name: "forumDeatil",
+                component: () => import("@/views/community/components/ForumDeatil.vue")
+            }
+        ]
     },
     {
         path: "create",

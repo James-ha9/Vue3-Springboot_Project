@@ -140,6 +140,7 @@ import image4 from "@/assets/background/love1.png";
 
 const route = useRoute();
 const router = useRouter();
+let fit = ref(null);
 
 const imageUrl = ref(image4);
 

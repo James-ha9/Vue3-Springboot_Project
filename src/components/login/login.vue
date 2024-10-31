@@ -67,6 +67,10 @@ const password = ref("");
 const loading = ref(false);
 const router = useRouter();
 
+// const handleLogin = async () => {
+//   await router.push('/main/charitable-projects/platform-charity');
+// };
+
 const handleLogin = async () => {
   if (!username.value || !password.value) {
     ElMessage.warning('请输入用户名和密码');
@@ -81,6 +85,8 @@ const handleLogin = async () => {
       ElMessage.success('登录成功');
       // 使用 await 等待路由跳转完成
       await router.push('/main/charitable-projects/platform-charity');
+      // 触发全局事件，通知需要更新用户信息的组件
+      window.dispatchEvent(new Event('user-logged-in'));
     } else {
       throw new Error('登录失败：未收到有效的认证信息');
     }
