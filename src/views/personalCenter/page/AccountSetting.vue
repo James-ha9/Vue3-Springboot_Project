@@ -35,27 +35,24 @@
         width="30%" 
         center
       >
-        <template v-if="dialogType === 'phone'">
-          <span>原手机号 {{ currentPhone }}</span>
+        <template v-if="dialogType === 'phone' || dialogType === 'email'">
+          <el-input
+            v-model="newValue"
+            :placeholder="dialogType === 'phone' ? '请输入新手机号' : '请输入新邮箱'"
+            class="verification-input"
+          />
           <el-input
             v-model="verificationCode"
             placeholder="验证码"
             class="verification-input"
           >
             <template #append>
-              <el-button @click="getVerificationCode">获取验证码</el-button>
-            </template>
-          </el-input>
-        </template>
-        <template v-if="dialogType === 'email'">
-          <span>原邮箱 {{ currentEmail }}</span>
-          <el-input
-            v-model="verificationCode"
-            placeholder="验证码"
-            class="verification-input"
-          >
-            <template #append>
-              <el-button @click="getVerificationCode">获取验证码</el-button>
+              <el-button 
+                @click="getVerificationCode" 
+                :disabled="countdown > 0"
+              >
+                {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+              </el-button>
             </template>
           </el-input>
         </template>
@@ -73,15 +70,31 @@
         </template>
         <template v-if="dialogType === 'resetPassword'">
           <el-input
+            v-model="currentEmail"
+            placeholder="邮箱"
+            disabled
+            class="verification-input"
+          />
+          <el-input
             v-model="verificationCode"
             placeholder="请输入验证码"
             class="verification-input"
-          />
+          >
+            <template #append>
+              <el-button 
+                @click="getVerificationCode" 
+                :disabled="countdown > 0"
+              >
+                {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+              </el-button>
+            </template>
+          </el-input>
           <el-input
             v-model="newValue"
             type="password"
             placeholder="请输入新密码"
             show-password
+            class="verification-input"
           />
         </template>
         <template #footer>
@@ -97,7 +110,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
-import { getAccountSettings, updateAccountSettings, bindPhone, bindEmail, bindWechat, sendVerificationCode, deactivateAccount, resetPassword, confirmResetPassword } from '@/api/user';
+import { getAccountSettings, updateAccountSettings, bindPhone, bindEmail, bindWechat, resetPassword, deactivateAccount, sendVerificationCode } from '@/api/user';
 import { logout } from '@/api/auth';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
@@ -159,17 +172,29 @@ const accountItems = ref([
   }
 ]);
 
-// 添加认证检查
-onBeforeMount(() => {
+// 修改 onBeforeMount 为路由守卫
+const checkAuth = async () => {
   const token = localStorage.getItem('token');
-  if (!token) {
+  const userId = localStorage.getItem('userId');
+  
+  if (!token || !userId) {
+    ElMessage.error('请先登录');
     router.push('/login');
-    return;
+    return false;
+  }
+  return true;
+};
+
+onBeforeMount(async () => {
+  if (await checkAuth()) {
+    await fetchAccountSettings();
   }
 });
 
-onMounted(() => {
-  fetchAccountSettings();
+onMounted(async () => {
+  if (await checkAuth()) {
+    await fetchAccountSettings();
+  }
 });
 
 const fetchAccountSettings = async () => {
@@ -180,72 +205,81 @@ const fetchAccountSettings = async () => {
     }
 
     const response = await getAccountSettings(userId);
-    const settings = response.data.settings;
-    
-    if (settings) {
-      // 更新手机号状态
-      if (settings.phone) {
-        const item = accountItems.value.find(item => item.name === "手机");
-        if (item) {
-          item.status = settings.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
-          item.buttonText = "换绑";
+    console.log('Settings response:', response);
+
+    if (response.data) {
+      const settings = response.data;
+      
+      // 更新邮箱状态
+      if (settings.email) {
+        currentEmail.value = settings.email;
+        const emailItem = accountItems.value.find(item => item.name === "邮箱");
+        if (emailItem) {
+          emailItem.status = settings.email;
+          emailItem.buttonText = "修改";
         }
       }
 
-      // 更新邮箱状态
-      if (settings.email) {
-        const item = accountItems.value.find(item => item.name === "邮箱");
-        if (item) {
-          item.status = settings.email.replace(/(.{3}).+(@.+)/, '$1****$2');
-          item.buttonText = "换绑";
+      // 更新手机号状态
+      const phoneItem = accountItems.value.find(item => item.name === "手机");
+      if (phoneItem) {
+        if (settings.phone) {
+          phoneItem.status = settings.phone;
+          phoneItem.buttonText = "修改";
+          currentPhone.value = settings.phone;
+        } else {
+          phoneItem.status = "未绑定";
+          phoneItem.buttonText = "绑定";
         }
       }
 
       // 更新微信状态
-      if (settings.wechat) {
-        const item = accountItems.value.find(item => item.name === "微信");
-        if (item) {
-          item.status = "已绑定";
-          item.buttonText = "换绑";
+      const wechatItem = accountItems.value.find(item => item.name === "微信");
+      if (wechatItem) {
+        if (settings.wechat) {
+          wechatItem.status = settings.wechat;
+          wechatItem.buttonText = "修改";
+        } else {
+          wechatItem.status = "未绑定";
+          wechatItem.buttonText = "绑定";
         }
       }
-
-      // 保存当前值以供后续使用
-      currentPhone.value = settings.phone || '';
-      currentEmail.value = settings.email || '';
     }
   } catch (error) {
     console.error('Failed to fetch account settings:', error);
     ElMessage.error('获取账户设置失败');
-    if (error.response?.status === 401) {
-      router.push('/login');
-    }
   }
 };
 
 const handleClick = async (item) => {
-  dialogType.value = item.name.toLowerCase();
-  
+  dialogType.value = '';
+  dialogTitle.value = '';
+  newValue.value = '';
+  verificationCode.value = '';
+
   switch (item.name) {
     case '手机':
-      dialogTitle.value = item.status === '未绑定' ? '绑定手机' : '换绑手机';
-      currentPhone.value = item.status;
+      dialogType.value = 'phone';
+      dialogTitle.value = '绑定手机号';
       break;
     case '邮箱':
-      dialogTitle.value = item.status === '未绑定' ? '绑定邮箱' : '换绑邮箱';
-      currentEmail.value = item.status;
+      dialogType.value = 'email';
+      dialogTitle.value = '绑定邮箱';
       break;
+    case '密码':
+      handleResetPassword();
+      return;
     case '微信':
       handleWechatBind();
       return;
     case '账号注销':
       handleDeactivate();
       return;
-    default:
-      return;
   }
   
-  dialogVisible.value = true;
+  if (dialogType.value) {
+    dialogVisible.value = true;
+  }
 };
 
 const getVerificationCode = async () => {
@@ -253,15 +287,42 @@ const getVerificationCode = async () => {
   
   try {
     loading.value = true;
-    const target = dialogType.value === 'phone' ? newValue.value : 
-                  dialogType.value === 'email' ? newValue.value : 
-                  currentPhone.value;
-    
+    let target;
+
+    switch (dialogType.value) {
+      case 'phone':
+        if (!newValue.value) {
+          throw new Error('请输入手机号');
+        }
+        target = newValue.value;
+        break;
+      case 'email':
+        if (!newValue.value) {
+          throw new Error('请输入邮箱');
+        }
+        target = newValue.value;
+        break;
+      case 'resetPassword':
+        if (!currentEmail.value) {
+          throw new Error('邮箱不能为空');
+        }
+        target = currentEmail.value;
+        break;
+      default:
+        throw new Error('未知的验证码类型');
+    }
+
+    // 发送验证码请求，只发送邮箱
     await sendVerificationCode(dialogType.value, target);
-    ElMessage.success('验证码已发送');
+    ElMessage.success('验证码已发送至您的邮箱');
     startCountdown();
   } catch (error) {
-    ElMessage.error(error.message || '发送验证码失败');
+    console.error('Failed to send verification code:', error);
+    ElMessage.error(
+      error.response?.data || 
+      error.message || 
+      '发送验证码失败，请稍后重试'
+    );
   } finally {
     loading.value = false;
   }
@@ -280,6 +341,7 @@ const handleWechatBind = async () => {
 
 const handleDeactivate = async () => {
   try {
+    // 直接弹出确认对话框
     await ElMessageBox.confirm(
       '注销账号后，所有数据将被永久删除且无法恢复。确定要继续吗？',
       '警告',
@@ -290,11 +352,13 @@ const handleDeactivate = async () => {
       }
     );
     
+    // 用户确认后直接删除账号
     const userId = localStorage.getItem('userId');
-    await deactivateAccount(userId, verificationCode.value);
+    await deactivateAccount(userId);
     ElMessage.success('账号已注销');
-    logout();
-    router.push('/login');
+    await logout();
+    router.push('/register');
+    
   } catch (error) {
     if (error !== 'cancel') {
       console.error('Account deactivation failed:', error);
@@ -305,20 +369,23 @@ const handleDeactivate = async () => {
 
 const handleResetPassword = async () => {
   try {
-    const email = currentEmail.value;
-    if (!email) {
+    // 检查是否有邮箱
+    if (!currentEmail.value) {
       ElMessage.warning('请先绑定邮箱');
       return;
     }
 
-    await resetPassword(email);
-    ElMessage.success('重置密码验证码已发送到您的邮箱');
+    // 重置表单状态
+    newValue.value = ''; // 清空新密码
+    verificationCode.value = ''; // 清空验证码
+    
+    // 打开对话框
     dialogType.value = 'resetPassword';
     dialogTitle.value = '重置密码';
     dialogVisible.value = true;
   } catch (error) {
     console.error('Reset password failed:', error);
-    ElMessage.error('重置密码失败');
+    ElMessage.error(error.response?.data?.error || '重置密码失败');
   }
 };
 
@@ -335,34 +402,46 @@ const submitChange = async () => {
     switch (dialogType.value) {
       case 'phone':
         await updateAccountSettings(userId, {
-          phone: newValue.value,
-          verificationCode: verificationCode.value
+          phone: newValue.value
         });
         ElMessage.success('手机号更新成功');
         break;
         
       case 'email':
         await updateAccountSettings(userId, {
-          email: newValue.value,
-          verificationCode: verificationCode.value
+          email: newValue.value
         });
         ElMessage.success('邮箱更新成功');
         break;
         
       case 'wechat':
         await updateAccountSettings(userId, {
-          wechatId: newValue.value
+          wechat: newValue.value
         });
-        ElMessage.success('微信绑定成功');
+        ElMessage.success('微信更新成功');
         break;
         
       case 'resetPassword':
-        await confirmResetPassword(
+        if (!newValue.value) {
+          ElMessage.warning('请输入新密码');
+          return;
+        }
+        if (!verificationCode.value) {
+          ElMessage.warning('请输入验证码');
+          return;
+        }
+        
+        // 调用重置密码接口，不需要传递 userId
+        await resetPassword(
           currentEmail.value,
           verificationCode.value,
-          newValue.value // 新密码
+          newValue.value
         );
-        ElMessage.success('密码重置成功');
+        
+        ElMessage.success('密码重置成功，请重新登录');
+        dialogVisible.value = false;
+        await logout();
+        router.push('/login');
         break;
         
       case 'deactivate':
@@ -378,13 +457,15 @@ const submitChange = async () => {
         
         await deactivateAccount(userId, verificationCode.value);
         ElMessage.success('账号已注销');
-        logout();
+        await logout();
+        router.push('/login');
         break;
     }
 
     dialogVisible.value = false;
-    await fetchAccountSettings(); // 刷新设置
+    await fetchAccountSettings();
   } catch (error) {
+    if (error === 'cancel') return;
     console.error('Operation failed:', error);
     ElMessage.error(error.response?.data?.error || '操作失败');
   } finally {

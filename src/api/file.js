@@ -21,3 +21,38 @@ export const getAvatarUrl = (filename) => {
   // 构建访问 FileController 的完整URL
   return `${import.meta.env.VITE_API_BASE_FILE_URL}${filename}`;
 };
+
+export const uploadAvatar = async (userId, formData) => {
+  try {
+    console.log('Uploading avatar for user:', userId);
+    console.log('FormData contents:', Array.from(formData.entries()));
+    
+    const response = await axios.post(
+      `/users/${userId}/profile/avatar`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          console.log('Upload progress:', percentCompleted);
+        },
+      }
+    );
+    
+    console.log('Upload response:', response);
+    
+    return {
+      data: {
+        avatarUrl: response.data.url || response.data.avatarUrl || response.data.path
+      }
+    };
+  } catch (error) {
+    console.error('Upload avatar error:', error);
+    console.error('Error response:', error.response?.data);
+    throw error;
+  }
+};

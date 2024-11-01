@@ -60,6 +60,7 @@ import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise";
 import { useRouter } from "vue-router";
 import { login } from '@/api/auth';
 import { ElMessage } from 'element-plus';
+import { uploadAvatar } from '@/api/file';
 
 const threeCanvas = ref(null);
 const username = ref("");
