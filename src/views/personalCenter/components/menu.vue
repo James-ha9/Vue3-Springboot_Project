@@ -2,24 +2,23 @@
   <el-row>
     <el-col :span="24">
       <el-menu
-        default-active="2"
+        :default-active="activeIndex"
         class="el-menu-vertical-demo"
-        @open="menuActive"
-        @close="menuClose"
-        @click="isActive"
+        :router="true"
       >
-        <el-sub-menu index="1">
+        <el-sub-menu index="user-settings">
           <template #title>
-            <el-icon><location /></el-icon>
+            <el-icon><Setting /></el-icon>
             <span>用户设置</span>
           </template>
-          <router-link
-            v-for="item in menuItems"
+          <el-menu-item 
+            v-for="item in menuItems" 
             :key="item.name"
-            :to="{ name: item.name }"
+            :index="item.name"
+            :route="{ name: item.name }"
           >
-            <el-menu-item :index="item.name">{{ item.label }}</el-menu-item>
-          </router-link>
+            {{ item.label }}
+          </el-menu-item>
         </el-sub-menu>
       </el-menu>
     </el-col>
@@ -27,22 +26,14 @@
 </template>
 
 <script setup>
-import {
-  Document,
-  Menu as IconMenu,
-  Location,
-  Setting,
-} from "@element-plus/icons-vue";
-import { ref } from "vue";
+import { ref, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { Setting } from "@element-plus/icons-vue";
 
-let menuActive = ref(true)
-let menuClose = ref(false)
+const route = useRoute();
 
-const isActive = (key, keyPath) => {
-  menuActive.value = !menuActive.value
-  menuClose.value = !menuClose.value
-  console.log(key, keyPath);
-};
+// 计算当前激活的菜单项
+const activeIndex = computed(() => route.name);
 
 const menuItems = [
   {
@@ -56,4 +47,12 @@ const menuItems = [
 ];
 </script>
 
-<style scoped></style>
+<style scoped>
+.el-menu-vertical-demo {
+  border-right: none;
+}
+
+.el-menu-item.is-active {
+  background-color: #ecf5ff;
+}
+</style>

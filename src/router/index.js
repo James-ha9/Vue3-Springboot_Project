@@ -102,4 +102,24 @@ const router = createRouter({
   },
 });
 
+// 添加全局导航守卫
+router.beforeEach((to, from, next) => {
+  // 检查路由是否需要认证
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    
+    if (!token || !userId) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
+
 export default router;

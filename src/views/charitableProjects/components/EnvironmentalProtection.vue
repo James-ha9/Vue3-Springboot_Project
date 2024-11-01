@@ -93,6 +93,9 @@
 /* 背景相关样式更新 */
 .background {
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
   overflow: hidden;
   background: linear-gradient(
