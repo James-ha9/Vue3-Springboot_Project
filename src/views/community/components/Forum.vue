@@ -9,7 +9,7 @@
               <el-divider class="divider" />
             </div>
             <ForumList />
-            <Pagination />
+            
           </el-main>
           <el-aside width="500px" class="aside">
             <div class="title-list">
