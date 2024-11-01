@@ -193,7 +193,7 @@ const menuItems = [
     name: "community",
     emoji: "🤗",
     subItems: [
-      { label: "益论坛", name: "forum", emoji: "💬" },
+      { label: "益留言", name: "forum", emoji: "💬" },
       { label: "益回收", name: "recycling", emoji: "♻️" },
       { label: "照片墙", name: "photoWall", emoji: "📸" },
       { label: "益AI", name: "ai", emoji: "🤖" },
