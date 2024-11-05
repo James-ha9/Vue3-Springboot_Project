@@ -186,7 +186,7 @@ const menuItems = [
       { label: "绿水青山", name: "environmental-protection", emoji: "🌿" },
       { label: "乡村振兴", name: "rural-revitalization", emoji: "🏡" },
       { label: "应急救灾", name: "disaster-relief", emoji: "🆘" },
-      { label: "助残扶弱", name: "disability-support", emoji: "🤝" },
+      // { label: "助残扶弱", name: "disability-support", emoji: "🤝" },
       { label: "健康公益", name: "health-charity", emoji: "❤️" },
       { label: "国际公益", name: "international-charity", emoji: "🌍" },
     ],
