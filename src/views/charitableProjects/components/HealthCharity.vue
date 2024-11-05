@@ -1,227 +1,362 @@
 <template>
   <div class="background">
+    <!-- 主横幅区域 -->
     <div class="banner">
+      <div class="overlay"></div>
       <div class="title-content">
-        <div class="title">提高公众健康水平</div>
-        <div class="subtitle">增强民众身体素质，减少疾病发生，提升生活质量和预期寿命。</div>
+        <h1 class="main-title">健康，是生活最好的礼物</h1>
+        <p class="main-subtitle">在快节奏的现代生活中，健康成为了我们最宝贵的财富。</p>
       </div>
     </div>
-    <div class="projects">
-      <div class="project-list">
-        <router-link to="" class="project-item">
-          <img src="../../../assets/background/bg3.png" alt="" />
-          <div class="description">爱健康教育与宣传</div>
-        </router-link>
-        <router-link to="" class="project-item">
-          <img src="../../../assets/background/bg13.png" alt="" />
-          <div class="description">健康服务体系构建</div>
-        </router-link>
-        <router-link to="" class="project-item">
-          <img src="../../../assets/background/bg14.png" alt="" />
-          <div class="description">健康环境改善</div>
-        </router-link>
-        <router-link to="" class="project-item">
-          <img src="../../../assets/background/bg15.png" alt="" />
-          <div class="description">健康素养提升</div>
-        </router-link>
-        <router-link to="" class="project-item">
-          <img src="../../../assets/background/bg16.png" alt="" />
-          <div class="description">政策支持与保障</div>
-        </router-link>
 
+    <!-- 引言部分 -->
+    <div class="introduction">
+      <div class="intro-content">
+        <div class="intro-header">
+          <h2 class="intro-title">提高公众健康水平</h2>
+          <p class="intro-subtitle">增强民众身体素质，减少疾病发生，提升生活质量和预期寿命。</p>
+        </div>
+        
+        <div class="intro-media">
+          <!-- 将复杂的video标签改为简单的实现 -->
+          <video src="../../../assets/videos/health.mp4" controls></video>
+          <p class="video-caption">视频源于央视网新闻</p>
+        </div>  
 
+        <div class="intro-text">
+          <p>在快节奏的现代生活中，健康成为了我们最宝贵的财富。</p>
+          <p>在益行山区，我们坚信健康是每个人最宝贵的财富。我们的"健康公益"页面，致力于通过各种公益活动和服务，提升公众的健康水平，让健康的光芒照亮每一个角落。</p>
+          <p>加入我们，成为健康使者。在这里，每一次科普都是对生命的守护，每一次服务都是对幸福的投资。让我们携手，用爱心和行动，为公众健康保驾护航，共同创造一个更加健康、和谐的社会。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 健康小贴士部分 -->
+    <div class="health-tips">
+      <h2>健康小贴士</h2>
+      <div class="tips-container">
+        <!-- 第一行 -->
+        <div class="image-card">
+          <img src="../../../assets/background/002.jpg" alt="健康图片">
+        </div>
+        <div class="tip-card">
+          <i class="fas fa-utensils"></i>
+          <h3>健康饮食</h3>
+          <p>山区居民的饮食中蕴含着丰富的天然营养。我们鼓励居民多食用当地种植的新鲜蔬菜和水果。</p>
+        </div>
+        <div class="image-card">
+          <img src="../../../assets/background/000.jpg" alt="健康图片">
+        </div>
+
+        <!-- 第二行 -->
+        <div class="tip-card">
+          <i class="fas fa-running"></i>
+          <h3>适量运动</h3>
+          <p>在山区，自然就是我们的健身房。我们提倡居民参与徒步、爬山等户外活动。</p>
+        </div>
+        <div class="image-card">
+          <img src="../../../assets/background/yundong.png" alt="健康图片">
+        </div>
+        <div class="image-card">
+          <img src="../../../assets/background/yd2.jpg" alt="健康图片">
+        </div>
+
+        <!-- 第三行 -->
+        <div class="image-card">
+          <img src="../../../assets/background/PlatformCharity05.jpg" alt="健康图片">
+        </div>
+        <div class="image-card">
+          <img src="../../../assets/background/heart.jpg" alt="健康图片">
+        </div>
+        <div class="tip-card">
+          <i class="fas fa-brain"></i>
+          <h3>心理健康</h3>
+          <p>心理健康同样重要。我们提供简单的减压技巧，如深呼吸、冥想和瑜伽。</p>
+        </div>
+
+        <!-- 第四行 -->
+        <div class="image-card">
+          <img src="../../../assets/background/qibing.jpg" alt="健康图片">
+        </div>
+        <div class="tip-card">
+          <i class="fas fa-shield-virus"></i>
+          <h3>疾病预防</h3>
+          <p>清洁的饮水和良好的个人卫生习惯是预防疾病的关键。</p>
+        </div>
+        <div class="image-card">
+          <img src="../../../assets/background/jibing.jpg" alt="健康图片">
+        </div>
+      </div>
+    </div>
+
+    <!-- 互动问答部分 -->
+    <div class="qa-section">
+      <h2>你问我答</h2>
+      <div class="qa-description">
+        <p>健康是我们每个人最关心的话题之一。在这里，我们为您提供了一个平台，让您能够直接向我们的智能健康小助手提问。无论是关于日常饮食的疑惑，还是对特定运动计划的咨询，或是对心理健康的探讨，我们都将为您提供专业的解答。</p>
+      </div>
+      <div class="qa-button-container">
+        <a href="https://tbox.alipay.com/share/202411AP6dZA00119103?platform=WebService" 
+           target="_blank" 
+           class="qa-button">
+          <i class="fas fa-comments"></i>
+          向健康小助手提问
+        </a>
       </div>
     </div>
   </div>
 </template>
-    
-    <script setup>
-</script>
-    
-    <style scoped>
-* {
-  margin: 0;
-  padding: 0;
-}
 
-/* .background {
-  background: rgb(245, 245, 245);
-  font-size: 18px;
-} */
-
+<style scoped>
 .background {
-  background-color: rgb(245, 245, 245);
-  font-size: 18px;
-  margin: 0;
-  padding: 0;
-  margin: 0;
-  padding: 0;
   background-image: url("../../../assets/background/bg12.png");
   background-attachment: fixed;
-  background-repeat: no-repeat;
   background-size: cover;
-  background-position: center;
-  overflow-x: hidden;
+  color: #333;
 }
 
 .banner {
+  height: 100vh;
   position: relative;
-  height: 560px;
-  /* background-image: url("../../../assets/background/HealthCharityBackground.jpg"); */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .title-content {
-  color: #fff;
-  width: 80%;
-  padding-top: 160px;
-  margin: 0 auto;
   position: relative;
-  top: 0;
-  z-index: 10;
-  text-align: left;
+  z-index: 2;
+  text-align: center;
+  color: white;
 }
 
-.title {
-  font-size: 70px;
-  line-height: 1.3;
-  letter-spacing: 2px;
+.main-title {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: fadeInUp 1s ease;
 }
 
-.subtitle {
-  font-size: 20px;
+.introduction {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 4rem 0;
+  backdrop-filter: blur(5px);
+}
+
+.intro-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.intro-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.intro-title {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.intro-subtitle {
+  font-size: 1.2rem;
+  color: #333;
   line-height: 1.6;
-  margin-top: 10px;
-  letter-spacing: 1px;
 }
 
-.projects {
-  padding-top: 0;
-  position: relative;
-  z-index: 10;
-  min-height: 60vh;
-  padding-bottom: 90px;
-  width: 80%;
-  margin: 0 auto;
-  margin-top: -110px;
-}
-
-.project-list {
-  font-size: 0;
-  margin-bottom: 50px;
-  width: calc(100% + 130px);
-}
-
-.project-item {
+.intro-media {
+  margin: 2rem 0;
+  border-radius: 12px;
   overflow: hidden;
-  position: relative;
-  background: #fff;
-  border-radius: 20px;
-  margin-bottom: 30px;
-  margin-right: 20px;
-  float: left;
-  width: calc(33.333% - 20px);
-  height: 450px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.5);
 }
 
-.project-item img {
+.intro-image, .intro-video {
   width: 100%;
-  height: 360px;
+  height: 400px;
   object-fit: cover;
-  transition: transform 0.5s ease;
 }
 
-.project-item:hover img {
-  transform: scale(1.05);
-}
-
-.description {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  font-size: 18px;
-  width: 100%;
-  height: 90px;
-  line-height: 90px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  background-color: #fff;
-  z-index: 10;
+.intro-text {
   text-align: left;
-  padding: 0 35px;
-  color: #222;
-  transition: background-color 0.3s ease;
-  transition: color 0.3s ease;
+  line-height: 1.8;
 }
 
-.project-item:hover .description {
-  background-color: #fbc934;
-  color: #fff;
+.intro-text p {
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-weight: 500;
 }
-</style>
-    
 
+.health-tips {
+  padding: 4rem 0;
+  background: rgba(248, 249, 250, 0.85);
+  backdrop-filter: blur(5px);
+}
 
-<script setup>
-  // No specific logic needed, this is purely for layout purposes
-</script>
+.tips-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-<style scoped>
-  .health-public-service {
-    text-align: center;
-    background: url('../../../assets/background/test.jpg') no-repeat center center;
-    background-size: cover;
-    padding: 150px 0;
-    color: white;
-    overflow-x: hidden;
+.image-card {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  background: rgba(255, 255, 255, 0.85);
+}
 
+.image-card:hover {
+  transform: translateY(-5px);
+}
+
+.image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tip-card {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  aspect-ratio: 1;
+  transition: transform 0.3s ease;
+}
+
+.tip-card:hover {
+  transform: translateY(-5px);
+}
+
+.qa-section {
+  padding: 4rem 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(5px);
+}
+
+.qa-description {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  padding: 0 1.5rem;
+  text-align: center;
+  line-height: 1.8;
+  color: #555;
+}
+
+.qa-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.qa-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #4CAF50;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.qa-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background: #45a049;
+}
+
+.qa-button i {
+  font-size: 1.4rem;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .main-title {
+    font-size: 2.5rem;
+  }
+  
+  .tips-container {
+    grid-template-columns: 1fr;
   }
 
-  .header {
-    margin-bottom: 30px;
+  .intro-title {
+    font-size: 2rem;
+  }
+  
+  .intro-image, .intro-video {
+    height: 250px;
   }
 
-  .header h1 {
-    font-size: 3rem;
-    margin: 0;
+  .image-card, .tip-card {
+    aspect-ratio: 16/9;
   }
+}
 
-  .header p {
-    font-size: 1.2rem;
-    margin: 10px 0;
-  }
+.health-tips h2,
+.qa-section h2 {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
 
-  .card-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    max-width: 100%;
-    margin-top: -100px;
-  }
+.tip-card h3 {
+  color: #2c3e50;
+  margin: 1rem 0;
+}
 
-  .card {
-    background-color: white;
-    border-radius: 10px;
-    overflow: hidden;
-    width: 300px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
+.tip-card p,
+.question span,
+.answer {
+  color: #333;
+  font-weight: 500;
+}
 
-  .card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-  }
-
-  .card p {
-    background-color: #ff6600;
-    color: white;
-    margin: 0;
-    padding: 10px;
-    font-size: 1.1rem;
-  }
+.video-caption {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
 </style>
