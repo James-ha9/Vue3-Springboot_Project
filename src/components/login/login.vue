@@ -68,12 +68,19 @@ const password = ref("");
 const loading = ref(false);
 const router = useRouter();
 
+<<<<<<< Updated upstream
 // const handleLogin = async () => {
 //   await router.push('/main/charitable-projects/platform-charity');
 // };
 
 
 const handleLogin = async () => {
+=======
+const handleLogin = () => {
+  router.push('/main/charitable-projects/platform-charity');
+}
+/*const handleLogin = async () => {
+>>>>>>> Stashed changes
   if (!username.value || !password.value) {
     ElMessage.warning('请输入用户名和密码');
     return;
@@ -99,6 +106,7 @@ const handleLogin = async () => {
     loading.value = false;
   }
 };
+*/
 
 const validatePassword = () => {
   // 添加密码验证逻辑

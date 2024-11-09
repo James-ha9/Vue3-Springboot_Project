@@ -123,6 +123,7 @@
 </template>
 
 <script setup>
+<<<<<<< Updated upstream
 import { ref, onMounted, reactive, computed, nextTick, onUnmounted } from "vue";
 import { submitUsedItem, uploadUsedItemImage } from '@/api/usedItems';
 import { ElMessage } from 'element-plus';
@@ -131,6 +132,10 @@ import { useRouter } from 'vue-router';
 import { getUsedItemImageUrl } from '@/api/file';
 
 const router = useRouter();
+=======
+
+import { ref, onMounted, reactive } from "vue";
+>>>>>>> Stashed changes
 
 const emojis = [
   "♻️",
