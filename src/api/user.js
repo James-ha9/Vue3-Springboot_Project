@@ -15,70 +15,37 @@ import axios from './axios';
  * @param {AccountSettings} settings - 账户设置
  */
 export const updateAccountSettings = async (userId, settings) => {
-  try {
-    const response = await axios.put(`/users/${userId}/settings`, settings);
-    return response;
-  } catch (error) {
-    console.error('Update settings error:', error);
-    throw error;
-  }
+  return axios.put(`/users/${userId}/settings`, settings);
 };
 
 // 获取用户资料
 export const getUserProfile = async (userId) => {
-  try {
-    const response = await axios.get(`/users/${userId}/profile`);
-    return response;
-  } catch (error) {
-    console.error('Get profile error:', error);
-    throw error;
-  }
+  return axios.get(`/users/${userId}/profile`);
 };
 
 // 更新用户资料
 export const updateUserProfile = async (userId, profileData) => {
-  try {
-    const response = await axios.put(`/users/${userId}/profile`, profileData);
-    return response;
-  } catch (error) {
-    console.error('Update profile error:', error);
-    throw error;
-  }
+  return axios.put(`/users/${userId}/profile`, profileData);
 };
 
 // 获取账户设置
 export const getAccountSettings = async (userId) => {
-  try {
-    const response = await axios.get(`/users/${userId}/settings`);
-    return response;
-  } catch (error) {
-    console.error('Get settings error:', error);
-    throw error;
-  }
+  return axios.get(`/users/${userId}/settings`);
 };
 
-// 上传头像
-export const uploadAvatar = async (userId, file) => {
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    const response = await axios.post(`/users/${userId}/profile/avatar`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    return response;
-  } catch (error) {
-    console.error('Upload avatar error:', error);
-    throw error;
-  }
+// 发送验证码 - 统一使用需要认证的接口
+export const sendVerificationCode = (type, target) => {
+  return axios.post('/users/verification-code', {
+    type,
+    target
+  });
 };
 
-// 获取头像URL
-export const getAvatarUrl = (filename) => {
-  if (!filename) return null;
-  return `${import.meta.env.VITE_API_BASE_URL}/files/avatars/${filename}`;
+// 注销账号
+export const deactivateAccount = (userId, verificationCode) => {
+  return axios.post(`/users/${userId}/deactivate`, {
+    verificationCode
+  });
 };
 
 // 绑定手机号
@@ -99,21 +66,30 @@ export const bindEmail = (userId, email, verificationCode) => {
 
 // 绑定微信
 export const bindWechat = (userId) => {
-  // 获取微信授权URL
   return axios.get(`/users/${userId}/wechat-auth-url`);
 };
 
-// 发送验证码
-export const sendVerificationCode = (type, target) => {
-  return axios.post('/users/send-verification-code', {
-    type, // 'phone' 或 'email'
-    target // 手机号或邮箱
+// 创建一个不带认证的 axios 实例
+const publicAxios = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// 发送重置密码验证码（使用不带认证的实例）
+export const sendResetPasswordCode = (email) => {
+  return publicAxios.post('/users/reset-password', {
+    email
   });
 };
 
-// 注销账号
-export const deactivateAccount = (userId, verificationCode) => {
-  return axios.post(`/users/${userId}/deactivate`, {
-    verificationCode
+// 确认重置密码（使用不带认证的实例）
+export const confirmResetPassword = (email, verificationCode, newPassword) => {
+  return publicAxios.post('/users/confirm-reset-password', {
+    email,
+    verificationCode,
+    newPassword
   });
 };

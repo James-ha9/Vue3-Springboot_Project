@@ -8,6 +8,13 @@ export default [
         path: "forum",
         name: "forum",
         component: () => import("@/views/community/components/Forum.vue"),
+        children: [
+            {
+                path: "forumDeatil",
+                name: "forumDeatil",
+                component: () => import("@/views/community/components/ForumDeatil.vue")
+            }
+        ]
     },
     {
         path: "create",
@@ -18,6 +25,11 @@ export default [
         path: "recycling",
         name: "recycling",
         component: () => import("@/views/community/components/recycling.vue")
+    },
+    {
+        path: "recycling-preview",
+        name: "recycling-preview",
+        component: () => import("@/views/community/components/RecyclingAllPreview.vue")
     },
     {
         path: "photoWall",

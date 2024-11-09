@@ -5,11 +5,11 @@
         <el-container>
           <el-main class="main">
             <div class="title-list">
-              <span class="title">益论坛</span>
+              <span class="title">益留言</span>
               <el-divider class="divider" />
             </div>
             <ForumList />
-            <Pagination />
+            
           </el-main>
           <el-aside width="500px" class="aside">
             <div class="title-list">
@@ -22,6 +22,7 @@
     </div>
     </div>
   </div>
+  <!-- <router-view></router-view> -->
 </template>
 <script setup>
 import ForumList from "@/components/forum/forumList.vue";

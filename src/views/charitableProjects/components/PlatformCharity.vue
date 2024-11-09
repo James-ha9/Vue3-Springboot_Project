@@ -93,17 +93,16 @@
           <div class="image-container">
             <img
               src="../../../assets/background/PlatformCharity05.jpg"
-              alt="助残扶弱"
+              alt="公益筹款"
             />
             <div class="overlay">
               <p class="overlay-text">
-                在益行山区，我们用技术传递温暖，用行动支持力量。加入我们的"助残扶弱"行动，让每一次创新都为平等铺路，每一次援助都为尊严护航。让我们共同为残疾人士和弱势群体撑起希望的天空。
-              </p>
+                改变，从你我开始。加入我们的公益筹款，用你的爱心点亮希望之光。每一份捐赠，无论大小，都能在需要帮助的地方引发变革。立即行动，成为改变的一份子！              </p>
             </div>
           </div>
           <div class="project-info">
-            <div class="info1">助残扶弱</div>
-            <div class="info2">用有温度的技术<br />助残扶弱</div>
+            <div class="info1">公益筹款</div>
+            <div class="info2">汇聚爱心，助力希望<br />募捐筹款与项目认领</div>
           </div>
         </router-link>
         <router-link

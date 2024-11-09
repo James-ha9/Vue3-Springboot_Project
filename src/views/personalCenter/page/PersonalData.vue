@@ -67,9 +67,10 @@
 
 <script setup>
 import { reactive, ref, onMounted, onBeforeMount } from "vue";
-import { updateUserProfile, getUserProfile, getAvatarUrl } from '@/api/user';
+import { updateUserProfile, getUserProfile } from '@/api/user';
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
+import { getAvatar } from '@/api/file';
 
 const formSize = ref("default");
 const ruleFormRef = ref(null);
@@ -85,13 +86,30 @@ const ruleForm = reactive({
 });
 
 const rules = reactive({
-  name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-  career_direction: [{ required: true, message: "请输入职业方向", trigger: "blur" }],
-  position: [{ required: true, message: "请输入职位", trigger: "blur" }],
-  company: [{ required: true, message: "请输入公司", trigger: "blur" }],
-  personal_website: [{ required: true, message: "请输入个人网站", trigger: "blur" }],
-  bio: [{ required: true, message: "请输入个人简介", trigger: "blur" }],
-  interest_tags: [{ required: true, message: "至少选择一个兴趣标签", trigger: "change" }],
+  name: [
+    { required: true, message: "请输入用户名", trigger: "blur" },
+    { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+  ],
+  career_direction: [
+    { required: false }
+  ],
+  position: [
+    { required: false }
+  ],
+  company: [
+    { required: false }
+  ],
+  personal_website: [
+    { required: false },
+    { type: 'url', message: '请输入正确的网址格式', trigger: 'blur' }
+  ],
+  bio: [
+    { required: false },
+    { max: 500, message: "个人简介不能超过500字", trigger: "blur" }
+  ],
+  interest_tags: [
+    { type: 'array', required: false }
+  ]
 });
 
 const router = useRouter();
@@ -121,19 +139,23 @@ onMounted(async () => {
     }
 
     const response = await getUserProfile(userId);
-    const profile = response.data.profile;
+    // console.log('Profile response:', response);
     
-    if (profile) {
-      // 更新表单数据
-      Object.assign(ruleForm, {
-        name: profile.username || '',
-        career_direction: profile.careerDirection || '',
-        position: profile.position || '',
-        company: profile.company || '',
-        personal_website: profile.personalWebsite || '',
-        bio: profile.bio || '',
-        interest_tags: profile.interestTags ? profile.interestTags.split(',') : []
-      });
+    if (response.data) {
+      const profile = response.data;
+      
+      // 更新表单数据，使用可选链和空值合并操作符
+      ruleForm.name = profile?.username ?? '';
+      ruleForm.career_direction = profile?.careerDirection ?? '';
+      ruleForm.position = profile?.position ?? '';
+      ruleForm.company = profile?.company ?? '';
+      ruleForm.personal_website = profile?.personalWebsite ?? '';
+      ruleForm.bio = profile?.bio ?? '';
+      ruleForm.interest_tags = profile?.interestTags ? 
+        profile.interestTags.split(',').filter(Boolean) : 
+        [];
+        
+      // console.log('Updated form data:', ruleForm);
     }
   } catch (error) {
     console.error('Failed to fetch profile:', error);
@@ -144,73 +166,63 @@ onMounted(async () => {
 const submitForm = async (formEl) => {
   if (!formEl) return;
   
-  await formEl.validate(async (valid) => {
-    if (valid) {
-      try {
-        const userId = localStorage.getItem('userId');
-        if (!userId) {
-          throw new Error('User ID not found');
-        }
+  try {
+    const valid = await formEl.validate();
+    if (!valid) return;
 
-        // 构建提交数据
-        const profileData = {
-          username: ruleForm.name,
-          careerDirection: ruleForm.career_direction,
-          position: ruleForm.position,
-          company: ruleForm.company,
-          personalWebsite: ruleForm.personal_website,
-          bio: ruleForm.bio,
-          interestTags: ruleForm.interest_tags.join(',')
-        };
-
-        const response = await updateUserProfile(userId, profileData);
-        if (response.data.profile) {
-          ElMessage.success('个人资料更新成功');
-          // 更新导航栏用户信息
-          const navbarInstance = getCurrentInstance()?.parent?.refs?.navbar;
-          if (navbarInstance) {
-            navbarInstance.fetchUserInfo();
-          }
-        }
-      } catch (error) {
-        console.error('Failed to update profile:', error);
-        ElMessage.error(error.response?.data?.message || '更新失败');
-      }
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      throw new Error('User ID not found');
     }
-  });
+
+    // 构建提交数据，过滤掉空值
+    const profileData = {
+      username: ruleForm.name,
+      ...(ruleForm.career_direction && { careerDirection: ruleForm.career_direction }),
+      ...(ruleForm.position && { position: ruleForm.position }),
+      ...(ruleForm.company && { company: ruleForm.company }),
+      ...(ruleForm.personal_website && { personalWebsite: ruleForm.personal_website }),
+      ...(ruleForm.bio && { bio: ruleForm.bio }),
+      ...(ruleForm.interest_tags.length > 0 && { 
+        interestTags: ruleForm.interest_tags.join(',') 
+      })
+    };
+
+    console.log('Submitting profile data:', profileData);
+
+    const response = await updateUserProfile(userId, profileData);
+    console.log('Update response:', response);
+
+    ElMessage.success('个人资料更新成功');
+  } catch (error) {
+    console.error('Failed to update profile:', error);
+    ElMessage.error(error.response?.data?.message || '更新失败');
+  }
 };
 
-const options = Array.from({ length: 10000 }, (_, idx) => ({
-  value: `${idx + 1}`,
-  label: `${idx + 1}`,
-}));
-
-// 更新后的兴趣标签选项
+// 修改 interestOptions 的格式
 const interestOptions = [
-  { value: "环保倡导", label: "环保倡导" },
-  { value: "教育扶贫", label: "教育扶贫" },
-  { value: "动物保护", label: "动物保护" },
-  { value: "志愿服务", label: "志愿服务" },
-  { value: "健康与卫生", label: "健康与卫生" },
-  { value: "文化传播", label: "文化传播" },
-  { value: "灾害救援", label: "灾害救援" },
-  { value: "社会公平", label: "社会公平" },
-  { value: "心理援助", label: "心理援助" },
-  { value: "可再生能源", label: "可再生能源" },
-  { value: "国际援助", label: "国际援助" },
-  { value: "残障人士关爱", label: "残障人士关爱" },
-  { value: "老年人关怀", label: "老年人关怀" },
-  { value: "儿童权益保护", label: "儿童权益保护" },
-  { value: "性别平等", label: "性别平等" },
+  "环保倡导",
+  "教育扶贫",
+  "动物保护",
+  "志愿服务",
+  "健康与卫生",
+  "文化传播",
+  "灾害救援",
+  "社会公平",
+  "心理援助",
+  "可再生能源",
+  "国际援助",
+  "残障人士关爱",
+  "老年人关怀",
+  "儿童权益保护",
+  "性别平等"
 ];
 
-const handleChange = (value, checked) => {
-  const index = ruleForm.interests.indexOf(value);
-  if (checked && index === -1) {
-    ruleForm.interests.push(value);
-  } else if (!checked && index !== -1) {
-    ruleForm.interests.splice(index, 1);
-  }
+// 添加重置表单的方法
+const resetForm = (formEl) => {
+  if (!formEl) return;
+  formEl.resetFields();
 };
 </script>
 
