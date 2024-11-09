@@ -26,7 +26,7 @@
             <div class="image-wrapper">
               <img src="@/assets/background/bg1.png" alt="自然风光" />
               <div class="hover-text">
-                守护绿水青山，共创绿色未来。<br>益行山区，与自然同行，为生命添彩！
+                守护绿水青山，共创绿色未来。<br />益行山区，与自然同行，为生命添彩！
               </div>
             </div>
           </div>
@@ -37,7 +37,11 @@
           <div class="text-content">
             <h2>山区之美</h2>
             <div class="seasons-gallery">
-              <div class="season" v-for="(season, index) in seasons" :key="index">
+              <div
+                class="season"
+                v-for="(season, index) in seasons"
+                :key="index"
+              >
                 <img :src="season.image" :alt="season.name" />
                 <span class="season-name">{{ season.name }}</span>
               </div>
@@ -47,7 +51,10 @@
             </p>
           </div>
           <div class="visual-content">
-            <video src="@/assets/videos/EnvironmentalProtection.mp4" controls></video>
+            <video
+              src="@/assets/videos/EnvironmentalProtection.mp4"
+              controls
+            ></video>
           </div>
         </section>
 
@@ -64,7 +71,9 @@
               <li>在日常生活中节约用水，减少资源浪费</li>
               <li>支持可持续农业和生态旅游，促进当地经济发展</li>
             </ul>
-            <button class="action-button" @click="showDonationForm">立即参与</button>
+            <button class="action-button" @click="showDonationForm">
+              立即参与
+            </button>
           </div>
           <div class="visual-content">
             <img src="@/assets/background/ActivityNews10.jpeg" alt="环保行动" />
@@ -79,8 +88,13 @@
               守护绿水青山，共创绿色未来。加入我们，让每一步行走都成为对地球的爱护，让每一次行动都为可持续发展注入活力。
             </p>
             <div class="feedback-form">
-              <textarea v-model="userFeedback" placeholder="分享您对山区环境保护的看法和建议..."></textarea>
-              <button class="submit-button" @click="submitFeedback">提交反馈</button>
+              <textarea
+                v-model="userFeedback"
+                placeholder="分享您对山区环境保护的看法和建议..."
+              ></textarea>
+              <button class="submit-button" @click="submitFeedback">
+                提交反馈
+              </button>
             </div>
           </div>
         </section>
@@ -106,13 +120,13 @@
 }
 
 .background::before {
-  content: '';
+  content: "";
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('@/assets/background/bg1.png');
+  background-image: url("@/assets/background/bg1.png");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -121,13 +135,13 @@
 }
 
 .background::after {
-  content: '';
+  content: "";
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('@/assets/background/bg1.png');
+  background-image: url("@/assets/background/bg1.png");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -400,25 +414,25 @@
 </style>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import springImg from '@/assets/background/spring.jpg';
-import summerImg from '@/assets/background/bg6.png';
-import autumnImg from '@/assets/background/bg4.png';
-import winterImg from '@/assets/background/winter.jpg';
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import springImg from "@/assets/background/spring.jpg";
+import summerImg from "@/assets/background/bg6.png";
+import autumnImg from "@/assets/background/bg4.png";
+import winterImg from "@/assets/background/winter.jpg";
 
 // 用 ref 替代 data
-const userFeedback = ref('');
+const userFeedback = ref("");
 const seasons = ref([
   { name: "春日山花", image: springImg },
   { name: "夏日葱郁", image: summerImg },
   { name: "秋日层林", image: autumnImg },
-  { name: "冬日素裹", image: winterImg }
+  { name: "冬日素裹", image: winterImg },
 ]);
 
 // 方法定义
 const handleScroll = () => {
   const scrolled = window.pageYOffset;
-  const bgElement = document.querySelector('.background::after');
+  const bgElement = document.querySelector(".background::after");
   if (bgElement) {
     bgElement.style.transform = `scale(1.1) translateY(${scrolled * 0.05}px)`;
   }
