@@ -162,7 +162,13 @@ const handleMenuItemClick = (item) => {
 
 const handleSubItemClick = (subItem) => {
   if (!subItem.name) return;
-  console.log(`Navigating to ${subItem.name}`);
+  
+  // 特殊处理 recycling-preview 路由
+  // if (subItem.name === 'recycling-preview') {
+  //   router.push('/main/community/recycling'); // 或者跳转到一个默认的展示页面
+  //   return;
+  // }
+  
   router.push({ name: subItem.name });
   activeDropdown.value = null;
 };
@@ -200,6 +206,7 @@ const menuItems = [
       { label: "益回收", name: "recycling", emoji: "♻️" },
       { label: "照片墙", name: "photoWall", emoji: "📸" },
       { label: "益AI", name: "ai", emoji: "🤖" },
+      { label: "益物展", name: "recycling-preview", emoji: "🎁" }
     ],
   },
   // {
@@ -610,7 +617,7 @@ onMounted(() => {
   &.scrolled {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px); /* 添加模糊效果，模拟磨砂玻璃 */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 阴影增强立体感 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 阴影增强立���感 */
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }

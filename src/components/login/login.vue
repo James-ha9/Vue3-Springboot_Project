@@ -68,37 +68,37 @@ const password = ref("");
 const loading = ref(false);
 const router = useRouter();
 
-const handleLogin = async () => {
-  await router.push('/main/charitable-projects/platform-charity');
-};
-
-
 // const handleLogin = async () => {
-//   if (!username.value || !password.value) {
-//     ElMessage.warning('请输入用户名和密码');
-//     return;
-//   }
-
-//   try {
-//     loading.value = true;
-//     const response = await login(username.value, password.value);
-    
-//     if (response.data?.token) {
-//       ElMessage.success('登录成功');
-//       // 使用 await 等待路由跳转完成
-//       await router.push('/main/charitable-projects/platform-charity');
-//       // 触发全局事件，通知需要更新用户信息的组件
-//       window.dispatchEvent(new Event('user-logged-in'));
-//     } else {
-//       throw new Error('登录失败：未收到有效的认证信息');
-//     }
-//   } catch (error) {
-//     console.error('Login failed:', error);
-//     ElMessage.error(error.response?.data?.message || '登录失败，请检查用户名和密码');
-//   } finally {
-//     loading.value = false;
-//   }
+//   await router.push('/main/charitable-projects/platform-charity');
 // };
+
+
+const handleLogin = async () => {
+  if (!username.value || !password.value) {
+    ElMessage.warning('请输入用户名和密码');
+    return;
+  }
+
+  try {
+    loading.value = true;
+    const response = await login(username.value, password.value);
+    
+    if (response.data?.token) {
+      ElMessage.success('登录成功');
+      // 使用 await 等待路由跳转完成
+      await router.push('/main/charitable-projects/platform-charity');
+      // 触发全局事件，通知需要更新用户信息的组件
+      window.dispatchEvent(new Event('user-logged-in'));
+    } else {
+      throw new Error('登录失败：未收到有效的认证信息');
+    }
+  } catch (error) {
+    console.error('Login failed:', error);
+    ElMessage.error(error.response?.data?.message || '登录失败，请检查用户名和密码');
+  } finally {
+    loading.value = false;
+  }
+};
 
 const validatePassword = () => {
   // 添加密码验证逻辑

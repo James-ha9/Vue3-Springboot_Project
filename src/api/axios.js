@@ -26,14 +26,35 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // 只有在非重置密码相关的请求时才自动跳转
+    const isResetPasswordRequest = error.config.url.includes('reset-password');
+    
+    if (error.response?.status === 401 && !isResetPasswordRequest) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('userId');
       window.location.href = '/login';
     }
+    
+    // Log other errors
+    console.error('API Error:', error);
+    
     return Promise.reject(error);
   }
 );
+
+// // 响应拦截器
+// instance.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response?.status === 401) {
+//       localStorage.removeItem('token');
+//       localStorage.removeItem('user');
+//       localStorage.removeItem('userId');
+//       window.location.href = '/login';
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 export default instance;

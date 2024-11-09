@@ -110,7 +110,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
-import { getAccountSettings, updateAccountSettings, bindPhone, bindEmail, bindWechat, resetPassword, deactivateAccount, sendVerificationCode } from '@/api/user';
+import { getAccountSettings, updateAccountSettings, bindPhone, bindEmail, bindWechat, deactivateAccount, sendVerificationCode, sendResetPasswordCode, confirmResetPassword } from '@/api/user';
 import { logout } from '@/api/auth';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
@@ -288,6 +288,7 @@ const getVerificationCode = async () => {
   try {
     loading.value = true;
     let target;
+    let type;
 
     switch (dialogType.value) {
       case 'phone':
@@ -295,34 +296,42 @@ const getVerificationCode = async () => {
           throw new Error('请输入手机号');
         }
         target = newValue.value;
+        type = 'phone';
+        await sendVerificationCode(type, target);
         break;
       case 'email':
         if (!newValue.value) {
           throw new Error('请输入邮箱');
         }
         target = newValue.value;
+        type = 'email';
+        await sendVerificationCode(type, target);
         break;
       case 'resetPassword':
         if (!currentEmail.value) {
           throw new Error('邮箱不能为空');
         }
-        target = currentEmail.value;
+        await sendResetPasswordCode(currentEmail.value);
         break;
       default:
         throw new Error('未知的验证码类型');
     }
 
-    // 发送验证码请求，只发送邮箱
-    await sendVerificationCode(dialogType.value, target);
-    ElMessage.success('验证码已发送至您的邮箱');
+    ElMessage.success('验证码已发送');
     startCountdown();
   } catch (error) {
     console.error('Failed to send verification code:', error);
-    ElMessage.error(
-      error.response?.data || 
-      error.message || 
-      '发送验证码失败，请稍后重试'
-    );
+    if (error.response?.status === 401 && dialogType.value !== 'resetPassword') {
+      ElMessage.error('登录已过期，请重新登录');
+      await logout();
+      router.push('/login');
+    } else {
+      ElMessage.error(
+        error.response?.data?.message || 
+        error.message || 
+        '发送验证码失败，请稍后重试'
+      );
+    }
   } finally {
     loading.value = false;
   }
@@ -431,8 +440,7 @@ const submitChange = async () => {
           return;
         }
         
-        // 调用重置密码接口，不需要传递 userId
-        await resetPassword(
+        await confirmResetPassword(
           currentEmail.value,
           verificationCode.value,
           newValue.value
@@ -467,7 +475,11 @@ const submitChange = async () => {
   } catch (error) {
     if (error === 'cancel') return;
     console.error('Operation failed:', error);
-    ElMessage.error(error.response?.data?.error || '操作失败');
+    ElMessage.error(
+      error.response?.data?.message || 
+      error.message || 
+      '操作失败'
+    );
   } finally {
     loading.value = false;
     verificationCode.value = '';

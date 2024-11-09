@@ -74,7 +74,7 @@ const routes = [
         name: "personal-center",
         component: () => import("@/views/personalCenter/index.vue"),
         children: personalCenterRoutes,
-        redirect: { name: "personal-data" },
+        redirect: { name: "personal-data" }
       },
     ],
   },

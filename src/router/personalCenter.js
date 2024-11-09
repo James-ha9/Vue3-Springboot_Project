@@ -1,9 +1,5 @@
 export default [
     {
-        path: "",
-        redirect: { name: "personal-data" }
-    },
-    {
         path: "personal-data",
         name: "personal-data",
         component: () => import("@/views/personalCenter/page/PersonalData.vue"),

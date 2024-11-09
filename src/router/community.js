@@ -27,6 +27,11 @@ export default [
         component: () => import("@/views/community/components/recycling.vue")
     },
     {
+        path: "recycling-preview",
+        name: "recycling-preview",
+        component: () => import("@/views/community/components/RecyclingAllPreview.vue")
+    },
+    {
         path: "photoWall",
         name: "photoWall",
         component: () => import("@/views/community/components/photoWall.vue")

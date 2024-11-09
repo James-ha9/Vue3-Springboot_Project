@@ -56,3 +56,45 @@ export const uploadAvatar = async (userId, formData) => {
     throw error;
   }
 };
+
+// 添加通用文件上传函数
+export const uploadFile = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  try {
+    const response = await axios.post('/files/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('File upload error:', error);
+    throw error;
+  }
+};
+
+// 构建旧物图片完整URL
+export const getUsedItemImageUrl = (filename) => {
+  if (!filename) return null;
+  
+  // 如果已经是完整的URL，直接返回
+  if (filename.startsWith('http://') || filename.startsWith('https://')) {
+    return filename;
+  }
+  
+  // 如果是API路径，处理成完整URL
+  if (filename.startsWith('/api/')) {
+    return `${import.meta.env.VITE_API_BASE_URL}${filename.substring(4)}`;
+  }
+
+  // 如果是 /images 开头的路径
+  if (filename.startsWith('/images/')) {
+    return `${import.meta.env.VITE_API_BASE_URL}/files/used-items${filename}`;
+  }
+  
+  // 其他情况，拼接完整URL
+  const cleanFilename = filename.startsWith('/') ? filename.slice(1) : filename;
+  return `${import.meta.env.VITE_API_BASE_URL}/files/used-items/${cleanFilename}`;
+};
