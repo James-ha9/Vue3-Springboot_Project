@@ -33,19 +33,11 @@ export const getAccountSettings = async (userId) => {
   return axios.get(`/users/${userId}/settings`);
 };
 
-// 发送验证码 - 只发送 email
+// 发送验证码 - 统一使用需要认证的接口
 export const sendVerificationCode = (type, target) => {
-  return axios.post('/users/reset-password', {
-    email: target
-  });
-};
-
-// 重置密码
-export const resetPassword = (email, verificationCode, newPassword) => {
-  return axios.post('/users/confirm-reset-password', {
-    email,
-    verificationCode,
-    newPassword
+  return axios.post('/users/verification-code', {
+    type,
+    target
   });
 };
 
@@ -75,4 +67,29 @@ export const bindEmail = (userId, email, verificationCode) => {
 // 绑定微信
 export const bindWechat = (userId) => {
   return axios.get(`/users/${userId}/wechat-auth-url`);
+};
+
+// 创建一个不带认证的 axios 实例
+const publicAxios = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// 发送重置密码验证码（使用不带认证的实例）
+export const sendResetPasswordCode = (email) => {
+  return publicAxios.post('/users/reset-password', {
+    email
+  });
+};
+
+// 确认重置密码（使用不带认证的实例）
+export const confirmResetPassword = (email, verificationCode, newPassword) => {
+  return publicAxios.post('/users/confirm-reset-password', {
+    email,
+    verificationCode,
+    newPassword
+  });
 };
