@@ -1,10 +1,12 @@
 <template>
-  <div class="math">
-    <div
-      ref="chartContainer"
-      class="chart-container"
-      style="width: 1000px; height: 600px; margin: auto; margin-top: 20px"
-    ></div>
+  <div class="background">
+    <div class="math">
+      <div
+        ref="chartContainer"
+        class="chart-container"
+        style="width: 1000px; height: 800px; margin: auto; margin-top: 20px"
+      ></div>
+    </div>
   </div>
 </template>
 <script>
@@ -57,7 +59,7 @@ export default {
         series: [
           {
             type: "map",
-            name: "\u6350\u6b3e\u8005",
+            name: "捐款者",
             label: {
               show: true,
               margin: 8,
@@ -217,7 +219,7 @@ export default {
         ],
         legend: [
           {
-            data: ["\u6350\u6b3e\u8005"],
+            data: ["捐款者"],
             selected: {
               "\u6350\u6b3e\u8005": true,
             },
@@ -388,5 +390,18 @@ export default {
   height: 50vh;
   width: 50vw;
   scroll-snap-align: start;
+}
+.background {
+  background-color: rgb(245, 245, 245);
+  font-size: 18px;
+  margin: 0;
+  padding: 0;
+  margin: 0;
+  padding: 0;
+  background-image: url("../../../assets/background/jjh.jpg");
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 </style>
