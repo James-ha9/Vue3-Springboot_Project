@@ -282,26 +282,27 @@ const changePage = (page) => {
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  background-color: #fff;
   z-index: 10;
   text-align: left;
   padding: 15px 35px;
-  color: #fffbfbe1;
-  background-color: #14ae78;
-  transition: background-color 0.3s ease;
-  transition: color 0.3s ease;
+  color: #333;
+  background-color: #fff;
+  transition: all 0.3s ease;
 }
 
 .description .data {
   display: block;
   font-size: 14px;
   margin-top: 5px;
-  color: #fffbfbe1;
+  color: #666;
 }
 
 .project-item:hover .description {
-  color: #14ae78;
-  background-color: #e3c571;
+  background-color: #ffd700;
+  color: #fff;
+}
+
+.project-item:hover .description .data {
   color: #fff;
 }
 
@@ -327,7 +328,7 @@ const changePage = (page) => {
 }
 
 .page a.active {
-  background-color: #14ae78;
+  background-color: #ffffff7c;
   color: #fff;
 }
 
