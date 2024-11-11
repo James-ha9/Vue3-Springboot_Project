@@ -2,9 +2,6 @@
   <div class="forum-list">
     <div class="forum-item" v-for="item in forumList" :key="item.bbsPost.id">
       <div class="main">
-        <!-- <div class="avatar">
-          <el-icon :size="30"><User /></el-icon>
-        </div> -->
         <el-avatar
           shape="square"
           :size="50"
@@ -13,20 +10,14 @@
         />
         <div class="info">
           <div class="description">
-            <!-- <router-link>
+            <router-link :to="`/forum/detail/${item.bbsPost.id}`">
               {{ item.bbsPost.title }}
-            </router-link> -->
-            <a>
-              {{ item.bbsPost.title }}
-            </a>
+            </router-link>
           </div>
           <div class="user">
-            <!-- <router-link>
+            <router-link :to="`/user/${item.user.userId}`">
               {{ item.user.username }}
-            </router-link> -->
-            <a>
-              {{ item.user.username }}
-            </a>
+            </router-link>
           </div>
         </div>
       </div>
@@ -37,20 +28,29 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { getForumList } from "@/api/forum";
 
-let fit = ref(null);
-
+let fit = ref('cover');
 const forumList = ref([]);
+const currentPage = ref(1);
+const pageSize = ref(10);
 
+// 获取论坛列表数据
 const fetchForumList = async () => {
   try {
-    const response = await getForumList(); // 调用 API 获取论坛列表
-    forumList.value = response.data; // 更新 forumList
+    const response = await getForumList(currentPage.value, pageSize.value);
+    console.log('API Response:', response);
+
+    if (response.data && Array.isArray(response.data.list)) {
+      forumList.value = response.data.list;
+    } else {
+      forumList.value = [];
+      console.error('Unexpected data format:', response.data);
+    }
   } catch (error) {
     console.error('Error fetching forum list:', error);
+    forumList.value = [];
   }
 };
 
