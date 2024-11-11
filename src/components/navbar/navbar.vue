@@ -1,101 +1,103 @@
 <template>
-  <input
-    type="file"
-    ref="avatarInput"
-    @change="handleAvatarUpload"
-    accept="image/*"
-    style="display: none"
-  />
+  <div class="navbar-wrapper">
+    <input
+      type="file"
+      ref="avatarInput"
+      @change="handleAvatarUpload"
+      accept="image/*"
+      style="display: none"
+    />
 
-  <div class="navbar" ref="navbar" :class="{ scrolled: isScrolled }">
-    <router-link class="logo-a" to="/main/charitable-projects/platform-charity"
-      ><!----><img class="logo" src="../../assets/logo-icon.png" alt="Logo"
-    /></router-link>
-    <div class="logo-container">
-      <h1 class="logo-text-c">益行山区</h1>
-      <h2 class="logo-text-e">YingXing GOING!</h2>
-    </div>
-    <nav class="nav-menu">
-      <router-link
-        v-for="item in menuItems"
-        :key="item.name"
-        :to="getRouteForItem(item)"
-        class="nav-item"
-        :class="{ active: isActiveRoute(item) }"
-        @mouseover="showDropdown(item.name)"
-        @mouseleave="handleMenuItemMouseLeave"
-        @click="handleMenuItemClick(item)"
-      >
-        <span
-          v-if="item.name === 'personal-center'"
-          class="personal-center"
-          :ref="setAvatarRef"
-        >
-          <div 
-            class="avatar-container"
-            @mouseover="showAvatarDropdownMenu"
-            @mouseleave="hideAvatarDropdownMenu"
-          >
-            <img 
-              v-if="!avatarLoading"
-              :src="userAvatar" 
-              :alt="username"
-              @error="handleAvatarError"
-            />
-            <div v-else class="avatar-placeholder">
-              <el-icon class="loading-icon"><Loading /></el-icon>
-            </div>
-          </div>
-        </span>
-        <span v-else>{{ item.emoji }} {{ item.label }}</span>
-      </router-link>
-    </nav>
-    <transition
-      name="dropdown"
-      @before-enter="beforeEnter"
-      @enter="enter"
-      @leave="leave"
-    >
-      <div
-        v-if="activeDropdown"
-        class="dropdown-container"
-        ref="dropdownContainer"
-        @mouseover="clearHideDropdownTimer"
-        @mouseleave="handleDropdownMouseLeave"
-      >
-        <div class="dropdown">
-          <div class="dropdown-content">
-            <h3>{{ activeDropdown.emoji }} {{ activeDropdown.label }}</h3>
-            <ul>
-              <li
-                v-for="subItem in activeDropdown.subItems"
-                :key="subItem.name"
-                @click="handleSubItemClick(subItem)"
-              >
-                <router-link :to="{ name: subItem.name }">
-                  {{ subItem.emoji }} {{ subItem.label }}
-                </router-link>
-              </li>
-            </ul>
-          </div>
-        </div>
+    <div class="navbar" ref="navbar" :class="{ scrolled: isScrolled }">
+      <router-link class="logo-a" to="/main/charitable-projects/platform-charity"
+        ><!----><img class="logo" src="../../assets/logo-icon.png" alt="Logo"
+      /></router-link>
+      <div class="logo-container">
+        <h1 class="logo-text-c">益行山区</h1>
+        <h2 class="logo-text-e">YingXing GOING!</h2>
       </div>
-    </transition>
-    <Teleport to="body">
-      <transition name="dropdown">
-        <div
-          v-if="showAvatarDropdown"
-          class="avatar-dropdown"
-          :style="avatarDropdownPosition"
-          @mouseover="clearAvatarDropdownTimer"
-          @mouseleave="hideAvatarDropdownMenu"
+      <nav class="nav-menu">
+        <router-link
+          v-for="item in menuItems"
+          :key="item.name"
+          :to="getRouteForItem(item)"
+          class="nav-item"
+          :class="{ active: isActiveRoute(item) }"
+          @mouseover="showDropdown(item.name)"
+          @mouseleave="handleMenuItemMouseLeave"
+          @click="handleMenuItemClick(item)"
         >
-          <div class="avatar-dropdown-item" @click="triggerAvatarUpload">
-            更改头像
+          <span
+            v-if="item.name === 'personal-center'"
+            class="personal-center"
+            :ref="setAvatarRef"
+          >
+            <div 
+              class="avatar-container"
+              @mouseover="showAvatarDropdownMenu"
+              @mouseleave="hideAvatarDropdownMenu"
+            >
+              <img 
+                v-if="!avatarLoading"
+                :src="userAvatar" 
+                :alt="username"
+                @error="handleAvatarError"
+              />
+              <div v-else class="avatar-placeholder">
+                <el-icon class="loading-icon"><Loading /></el-icon>
+              </div>
+            </div>
+          </span>
+          <span v-else>{{ item.emoji }} {{ item.label }}</span>
+        </router-link>
+      </nav>
+      <transition
+        name="dropdown"
+        @before-enter="beforeEnter"
+        @enter="enter"
+        @leave="leave"
+      >
+        <div
+          v-if="activeDropdown"
+          class="dropdown-container"
+          ref="dropdownContainer"
+          @mouseover="clearHideDropdownTimer"
+          @mouseleave="handleDropdownMouseLeave"
+        >
+          <div class="dropdown">
+            <div class="dropdown-content">
+              <h3>{{ activeDropdown.emoji }} {{ activeDropdown.label }}</h3>
+              <ul>
+                <li
+                  v-for="subItem in activeDropdown.subItems"
+                  :key="subItem.name"
+                  @click="handleSubItemClick(subItem)"
+                >
+                  <router-link :to="{ name: subItem.name }">
+                    {{ subItem.emoji }} {{ subItem.label }}
+                  </router-link>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </transition>
-    </Teleport>
+      <Teleport to="body">
+        <transition name="dropdown">
+          <div
+            v-if="showAvatarDropdown"
+            class="avatar-dropdown"
+            :style="avatarDropdownPosition"
+            @mouseover="clearAvatarDropdownTimer"
+            @mouseleave="hideAvatarDropdownMenu"
+          >
+            <div class="avatar-dropdown-item" @click="triggerAvatarUpload">
+              更改头像
+            </div>
+          </div>
+        </transition>
+      </Teleport>
+    </div>
   </div>
 </template>
 
@@ -178,21 +180,16 @@ const leave = (el) => {
 };
 
 const menuItems = [
-  // {
-  //   label: "首页",
-  //   name: "home",
-  //   emoji: "🏠",
-  // },
   {
     label: "公益",
     name: "charitable-projects",
     emoji: "🌟",
     subItems: [
       { label: "平台公益", name: "platform-charity", emoji: "🏆" },
+      { label: "公益募捐", name: "disability-support", emoji: "🤝" },
       { label: "绿水青山", name: "environmental-protection", emoji: "🌿" },
       { label: "乡村振兴", name: "rural-revitalization", emoji: "🏡" },
       { label: "应急救灾", name: "disaster-relief", emoji: "🆘" },
-      // { label: "助残扶弱", name: "disability-support", emoji: "🤝" },
       { label: "健康公益", name: "health-charity", emoji: "❤️" },
       { label: "国际公益", name: "international-charity", emoji: "🌍" },
     ],
@@ -209,17 +206,6 @@ const menuItems = [
       { label: "益物展", name: "recycling-preview", emoji: "🎁" }
     ],
   },
-  // {
-  //   label: "关于",
-  //   name: "about-us",
-  //   emoji: "ℹ️",
-  //   subItems: [
-  //     { label: "基金会简介", name: "foundation-introduction", emoji: "📚" },
-  //     { label: "理事会简介", name: "board-intro", emoji: "👥" },
-  //     { label: "荣誉表彰", name: "honors", emoji: "🏅" },
-  //     { label: "联系我们", name: "contact-us", emoji: "📞" },
-  //   ],
-  // },
   {
     label: "资讯",
     name: "information",
@@ -594,6 +580,12 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.navbar-wrapper {
+  width: 100%;
+  position: relative;
+  z-index: 1000;
+}
+
 .navbar {
   position: fixed;
   top: 0;
@@ -617,7 +609,7 @@ onMounted(() => {
   &.scrolled {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px); /* 添加模糊效果，模拟磨砂玻璃 */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 阴影增强立���感 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 阴影增强立感 */
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
