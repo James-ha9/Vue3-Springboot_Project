@@ -20,4 +20,4 @@
 .el-pagination {
   --el-pagination-hover-color: #31755d;
 }
-</style>
+</style>  

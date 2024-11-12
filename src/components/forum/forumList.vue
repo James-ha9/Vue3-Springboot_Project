@@ -34,7 +34,7 @@ import { getForumList } from "@/api/forum";
 let fit = ref('cover');
 const forumList = ref([]);
 const currentPage = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(15);
 
 // 获取论坛列表数据
 const fetchForumList = async () => {
