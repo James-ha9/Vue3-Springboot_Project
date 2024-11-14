@@ -84,17 +84,14 @@ export const getUsedItemImageUrl = (filename) => {
     return filename;
   }
   
-  // 如果是API路径，处理成完整URL
-  if (filename.startsWith('/api/')) {
-    return `${import.meta.env.VITE_API_BASE_URL}${filename.substring(4)}`;
-  }
-
-  // 如果是 /images 开头的路径
-  if (filename.startsWith('/images/')) {
-    return `${import.meta.env.VITE_API_BASE_URL}/files/used-items${filename}`;
-  }
+  // 移除所有可能的前缀和重复路径
+  let cleanPath = filename
+    .replace(/^\/?(api\/)?/, '')  // 移除开头的 /api/
+    .replace(/^files\//, '')      // 移除 files/
+    .replace(/^used-items\//, '') // 移除 used-items/
+    .replace(/\/+/g, '/')         // 将多个斜杠替换为单个
+    .replace(/^\//, '');          // 移除开头的斜杠
   
-  // 其他情况，拼接完整URL
-  const cleanFilename = filename.startsWith('/') ? filename.slice(1) : filename;
-  return `${import.meta.env.VITE_API_BASE_URL}/files/used-items/${cleanFilename}`;
+  // 构建完整URL
+  return `${import.meta.env.VITE_API_BASE_URL}/files/used-items/${cleanPath}`;
 };

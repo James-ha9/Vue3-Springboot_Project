@@ -11,6 +11,10 @@ export const getUsedItems = async (page = 1, pageSize = 12) => {
         pageSize
       }
     });
+    
+    // 打印API响应
+    console.log('Used items API response:', response);
+    
     return response;
   } catch (error) {
     console.error('Get used items error:', error);

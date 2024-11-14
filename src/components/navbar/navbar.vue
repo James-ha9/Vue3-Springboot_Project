@@ -295,27 +295,42 @@ onMounted(() => {
 });
 
 const showDropdown = (name) => {
+  // 清除任何现有的隐藏定时器
+  clearTimeout(hideDropdownTimer);
+  
   if (name === "personal-center") {
     nextTick(() => {
       showAvatarDropdown.value = true;
     });
     return;
   }
-  showAvatarDropdown.value = false;
-  activeDropdown.value = menuItems.find((item) => item.name === name);
+  
+  // 如果当前显示的下拉框与要显示的不同，先清除当前的
+  if (activeDropdown.value && activeDropdown.value.name !== name) {
+    activeDropdown.value = null;
+  }
+  
+  // 设置新的下拉框
+  nextTick(() => {
+    activeDropdown.value = menuItems.find((item) => item.name === name);
+  });
 };
 
 const handleMenuItemMouseLeave = (event) => {
+  // 清除任何现有的隐藏定时器
+  clearTimeout(hideDropdownTimer);
+  
   hideDropdownTimer = setTimeout(() => {
     const target = event.relatedTarget;
-    if (
-      !target ||
-      (!target.closest(".avatar-dropdown") && !target.closest(".nav-item"))
-    ) {
+    // 检查鼠标是否移动到下拉框或其他导航项
+    if (!target || 
+        (!target.closest(".dropdown-container") && 
+         !target.closest(".nav-item") && 
+         !target.closest(".avatar-dropdown"))) {
       activeDropdown.value = null;
       showAvatarDropdown.value = false;
     }
-  }, 200);
+  }, 150); // 减少延迟时间
 };
 
 const triggerAvatarUpload = () => {
@@ -337,26 +352,28 @@ const handleDropdownMouseLeave = (event) => {
   if (dropdownContainer.value) {
     const dropdownRect = dropdownContainer.value.getBoundingClientRect();
     const { clientX, clientY } = event;
-
-    // 只有当鼠标位置在下拉框的下方或左右两侧时才启动隐藏计时器
-    if (
-      clientY > dropdownRect.bottom ||
-      clientX < dropdownRect.left ||
-      clientX > dropdownRect.right
-    ) {
-      startHideDropdownTimer();
+    
+    // 检查鼠标是否真的离开了下拉框区域
+    if (clientY > dropdownRect.bottom ||
+        clientX < dropdownRect.left ||
+        clientX > dropdownRect.right) {
+      clearTimeout(hideDropdownTimer);
+      hideDropdownTimer = setTimeout(() => {
+        // 再次检查鼠标位置，确保不是移动到了其他导航项
+        const currentTarget = document.elementFromPoint(clientX, clientY);
+        if (!currentTarget?.closest(".nav-item")) {
+          activeDropdown.value = null;
+        }
+      }, 100);
     }
   }
 };
 
-const startHideDropdownTimer = () => {
-  hideDropdownTimer = setTimeout(() => {
-    activeDropdown.value = null;
-  }, 200);
-};
-
 const clearHideDropdownTimer = () => {
-  clearTimeout(hideDropdownTimer);
+  if (hideDropdownTimer) {
+    clearTimeout(hideDropdownTimer);
+    hideDropdownTimer = null;
+  }
 };
 
 const handleClickOutside = (event) => {

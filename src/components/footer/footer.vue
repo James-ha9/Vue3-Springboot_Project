@@ -32,7 +32,7 @@
               <li><router-link to="/main/charitable-projects/international-charity" class="footer-link">国际公益</router-link></li>
             </ul>
           </div>
-          <div class="footer-column">
+          <!-- <div class="footer-column">
             <h3 class="footer-heading">
               <Heart class="footer-icon" :size="20" />
               关于我们
@@ -43,16 +43,28 @@
               <li><router-link to="/main/about-us/honors" class="footer-link">荣誉表彰</router-link></li>
               <li><router-link to="/main/about-us/contact-us" class="footer-link">联系我们</router-link></li>
             </ul>
-          </div>
+          </div> -->
           <div class="footer-column">
             <h3 class="footer-heading">
               <Users class="footer-icon" :size="20" />
               社区
             </h3>
             <ul class="footer-list">
-              <li><router-link to="/main/community/forum" class="footer-link">益论坛</router-link></li>
+              <li><router-link to="/main/community/forum" class="footer-link">益留言</router-link></li>
               <li><router-link to="/main/community/recycling" class="footer-link">益回收</router-link></li>
               <li><router-link to="/main/community/photoWall" class="footer-link">照片墙</router-link></li>
+              <li><router-link to="/main/community/ai" class="footer-link">益AI</router-link></li>
+              <li><router-link to="/main/community/recycling-preview" class="footer-link">益物展</router-link></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h3 class="footer-heading">
+              <Heart class="footer-icon" :size="20" />
+              资讯
+            </h3>
+            <ul class="footer-list">
+              <li><router-link to="/main/information/activity-news" class="footer-link">活动新闻</router-link></li>
+              <li><router-link to="/main/information/research-reports" class="footer-link">研究报告</router-link></li>
             </ul>
           </div>
         </div>
